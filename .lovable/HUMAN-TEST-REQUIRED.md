@@ -6,7 +6,15 @@
 Preview base: https://id-preview--57ce9992-64d0-4435-8a61-143476b51606.lovable.app
 Use the Lovable preview when access is restricted; Google consent and 2FA belong to the account owner. Never share password, cookies or codes in chat.
 
-## Current status — 2026-11-13, 21:42 UTC
+## Authorized demo follow-up — 2026-11-13, 22:02 UTC
+- **PASS database/UI readback:** existing Strategy 75,000 MMK / 30 days and Creation 55,000 MMK / 60 days, statuses unchanged, both price_approved=false. Exact requested placeholder instructions saved using Admin Settings, refreshed and verified published=false. No receipts, orders, enrollments, codes, lessons, accounts or roles changed.
+- **PASS demo safety:** signed-in Payments shows static read-only DEMO copy, never reads admin draft details. No payment/upload controls; course buttons disabled. Public settings policy still requires published; draft is admin-only. Course prices/durations visibly temporary/DEMO, not real approved offers.
+- **PASS verification:** desktop 1280×1800/mobile 390×844 screenshots checked, exact copy/terms, no overflow or page errors; repeat protected navigation/local-only logout/private denial regression passed. 41 tests PASS / 1 mutating SKIP; automatic compilation OK; basic security scan clean and 54 production dependencies clean. Deep analysis and live financial/device tests are not covered by these passes.
+- **UNPUBLISHED CONFIRMED:** is_published=false; no publication/deployment/domain/visibility changes. Saving a course's existing catalog status is not site publication.
+- **BUNNY UNCONFIGURED:** owner instructions in `.lovable/BUNNY-STREAM-SETUP.md`; no library/resource/charges/keys created or collected. Securely configuring Bunny later does not alone implement protected playback.
+- **HUMAN REQUIRED / BLOCKED:** real owner admin/student denial/server logout, two browsers/third denied/revocation/new-session recovery; separately approved real payment terms and legitimate receipts; actual protected streaming in Myanmar, expiry and isolated restore. Existing #1–11 remain open; demo data does not satisfy them.
+
+## Previous status — 2026-11-13, 21:42 UTC
 - **UNPUBLISHED CONFIRMED:** owner unpublished; settings is_published=false. Saved public audience is not a live publication. Keep current Cloud/database; no external migration. Do not publish/deploy/change domain/visibility.
 - **PASS automated:** 38 tests, 1 live-mutating test skipped; automatic compilation OK; desktop/mobile repeated redirects, exact anonymous private-function denial, private-table denial, read-only injected admin checklist/device guidance and closed payment views. Basic/dependency scans pass; reviewed linter flags remain, deep review not refreshed.
 - **USER CONFIRMED:** own Google login works only. Available injected session lacks a device session claim; cannot substitute for real device or logout checks.
@@ -24,7 +32,7 @@ Use the Lovable preview when access is restricted; Google consent and 2FA belong
 - **Automated current PASS:** desktop/mobile repeat redirect regression and onboarding link navigation, 19 unit tests, no known production dependency vulnerabilities, basic scan. Deep review remains stale. Public private-function probes using localhost identifiers returned generic 500 errors, not verified auth denials; published signed-in flows remain unverified.
 
 ## Before you start
-- Current state: two temporary prices 75,000/55,000 MMK, **neither approved**, no access durations/receiving instructions, zero orders/enrollments/lessons. Payments must remain closed.
+- Current state: two temporary prices 75,000/55,000 MMK, **neither approved**, demo access periods 30/60 days and unpublished placeholder instructions; zero orders/enrollments/lessons. No real approved receiving details. Payments must remain closed.
 - Existing authorized Google account: **phwayphway15000@gmail.com**. A separate real, owner-authorized student Google account is needed; do not impersonate an existing account.
 - Checks 1–4 and closed-state portions of 5 can start now. Checks 6–10 are **IMPOSSIBLE until required real configuration/content and legitimate records exist**. No fabricated transaction is acceptable.
 - Record date, browser/device, exact route, observed outcome and redacted screenshot. Do not include tokens, private receipts or codes in evidence.
@@ -59,7 +67,7 @@ Prerequisite: real student session and permission to change that student's regis
 
 ## 5. HUMAN REQUIRED — closed payments and real setup approval
 1. Visit [Strategy](https://id-preview--57ce9992-64d0-4435-8a61-143476b51606.lovable.app/courses/ai-marketing-strategy), [Creation](https://id-preview--57ce9992-64d0-4435-8a61-143476b51606.lovable.app/courses/ai-content-creation), and signed-in [Payments](https://id-preview--57ce9992-64d0-4435-8a61-143476b51606.lovable.app/payments).
-**PASS now:** prices marked temporary, payment disabled, no receipt upload; do not configure made-up terms.
+**PASS now:** prices/access marked temporary/DEMO, payment disabled, no receipt upload; read-only mock preview with no real mobile number/person. Admin Settings retains the exact DEMO ONLY copy as a draft (Publish unchecked). Do not publish mock instructions or approve demo prices. Only the expressly authorized 30/60-day demo terms were configured; they are not production terms.
 2. Only when owner supplies real approved prices/durations/receiving details: edit actual course at [Courses](https://id-preview--57ce9992-64d0-4435-8a61-143476b51606.lovable.app/admin/courses), enter approved terms, explicitly confirm price approval. Publish real receiving instructions at /admin/settings.
 3. Refresh course/student/admin screens. Changing a price must clear the checkbox until reconfirmed. Empty/whitespace instructions must not publish through the app.
 **PASS after config:** only fully approved course opens; any missing prerequisite keeps collection closed. **FAIL:** temporary price treated as approved, blank instructions enable collection, or course opens with NULL duration.

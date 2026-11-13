@@ -1,5 +1,14 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Authorized demo configuration — 2026-11-13, 22:02 UTC
+- [x] Database readback: Strategy 75,000 MMK / 30 days; Creation 55,000 MMK / 60 days. Both catalog statuses remain published, both price_approved=false; site remains unpublished.
+- [x] Exact mock payment_instructions saved via existing Admin Settings UI and reloaded with published=false; public-read policy still requires published. Student preview uses static mock copy, not private draft queries.
+- [x] Read-only preview desktop 1280×1800/mobile 390×844: exact copy/terms, no interactive controls/upload/submit, zero page errors/overflow. Public course buttons disabled, draft absent. Repeat redirect/privacy regression passed at both sizes.
+- [x] 41 unit tests PASS / 1 live-mutating SKIP; automatic compilation OK; basic security clean; all 54 production dependencies clean. Existing order transaction still rejects unapproved price/draft instructions; no orders/enrollments/lessons created.
+- [x] Owner Bunny setup guide saved; no library, charge, connection or secrets created. Playback stays blocked. Changes ready for repository commit.
+
+Changed files: `src/components/academy/StudentPages.tsx`, `src/components/academy/AdminPages.tsx`, `src/routes/courses_.$slug.tsx`, `src/lib/demo-payment.ts`, `src/lib/demo-payment.test.ts`, `AGENTS.md`, `.lovable/BUNNY-STREAM-SETUP.md`, `.lovable/HUMAN-TEST-REQUIRED.md`, `roadmap.md`.
+
 ## Current implementation (2026-11-13, 21:35 UTC)
 - [x] Implement explicit read-only playback checks, session-aware device guidance and account cache isolation.
 - [x] Add deterministic non-mutating role/session/device/payment/SQL tests: 38 PASS / 1 mutating SKIP; desktop/mobile privacy regression PASS.
@@ -26,7 +35,7 @@
 - [ ] BLOCKED: fresh deep security review — no callable trigger available; last persisted scan is complete but stale, request from Security.
 - [ ] HUMAN REQUIRED: post-OAuth admin menu/access, real student admin denial and server logout invalidation — user confirms own Google login only; injected read-only admin pages pass but injected token lacks session_id, so device tests require real OAuth sessions.
 - [ ] HUMAN REQUIRED: two-browser allowed/third denied, concurrent registration and revoked-session token-rotation test — real session IDs and controlled device changes required.
-- [ ] BLOCKED: real prices approved, access durations, receiving instructions, support/legal — owner-approved content absent; temporary 75k/55k unchanged, payments closed.
+- [ ] BLOCKED: real prices approved, real access terms/receiving instructions, support/legal — only demo 75k/30d and 55k/60d plus unpublished mock instructions authorized; payments closed.
 - [ ] BLOCKED/HUMAN REQUIRED: legitimate receipt, approval/rejection/duplicate approvals, delivery/replacement/redemption concurrency/window reset/expiry — requires configuration and explicitly approved nonfabricated test transactions.
 - [ ] BLOCKED: private signed-stream provider and real lessons — 0 lessons; getLearning intentionally unavailable; no resume/seek/completion or signed video delivery claim.
 - [ ] HUMAN REQUIRED after provider: Myanmar no-VPN desktop/mobile playback, backup/isolated restore and owner acceptance.
