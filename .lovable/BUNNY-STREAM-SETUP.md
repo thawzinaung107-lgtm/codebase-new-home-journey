@@ -2,6 +2,8 @@
 
 Status: **UNCONFIGURED / PLAYBACK BLOCKED**. This document does not create a library, purchase service, connect Bunny, or authorize publication. Keep the existing Lovable Cloud/database and keep this project unpublished. Do not send keys in chat or commit credentials.
 
+Current read-only audit (2026-11-13, 22:30 UTC request): all three required named server settings below are missing; 0 lessons/published lessons and no private video GUID mapping, signer or Bunny upload workflow. Owner's library configuration is not independently verified. Nothing was uploaded or purchased.
+
 ## 1. Create the library yourself when ready
 1. Sign in to your own Bunny account. Review current storage, delivery, minimum monthly usage, replication and optional DRM costs before proceeding. Creating/uploading may incur charges; nothing has been purchased by Lovable.
 2. Open Stream and create a video library named **AI Marketing Academy LMS**.
@@ -33,6 +35,11 @@ Status: **UNCONFIGURED / PLAYBACK BLOCKED**. This document does not create a lib
 When ready for a separately requested integration, add the two private keys yourself in **Project Settings → Secrets**, under the exact names above. Never put them in a frontend environment variable, source code, this document, screenshots, chat, or a committed `.env`. Do not generate random substitutes: these values must come from Bunny. No credentials were collected, saved, printed or requested during this task.
 
 Adding settings alone does **not** connect Bunny: the authenticated server signing and lesson mapping still need implementation and verification. Playback remains blocked until that work is explicitly requested and completed. [Server signing and key distinction](https://bunny.net/docs/stream/player/signed-embeds).
+
+### Future signer contract — not implemented
+Use `SHA256_HEX(tokenKey + videoGUID + expires)` with no separators, where `expires = floor(now/1000) + 300`. This is concatenated SHA-256, not HMAC. The requested iframe is `https://iframe.mediadelivery.net/embed/{libraryID}/{videoGUID}?token=...&expires=...`; current official [signed-embed examples](https://docs.bunny.net/stream/player/signed-embeds) show `player.mediadelivery.net`, so verify the actual supported iframe host before integration. [Official token algorithm](https://docs.bunny.net/docs/stream-embed-token-authentication) also specifies hex SHA-256 and Unix seconds.
+
+An authenticated server function must first verify current user, live nonrevoked session/registered browser (including session-wide revocation), active unexpired course enrollment, published lesson/course relationship and a private server-controlled GUID/library mapping. No client-supplied GUID, permanent URL, public loader/cache, log or MCP signing tool. Keep `getLearning` blocked until implemented and tested; store mappings outside anonymously readable lesson metadata. Configure direct HLS/CDN protection separately and verify playlist/segment denial while the authorized player works. Library API upload/processing workflow remains a separate future admin-only task; API key is not the token key.
 
 ## 5. Acceptance before any launch
 - Real owner Google admin access, consenting student's admin denial, two allowed browsers/third denied, real device revocation/new-session recovery and real server logout rejection remain HUMAN REQUIRED.
