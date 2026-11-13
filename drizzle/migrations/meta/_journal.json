@@ -43,6 +43,13 @@
       "when": 1794546618682,
       "tag": "0005_redeem_attempt_limit_and_function_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794546965350,
+      "tag": "0006_has_role_caller_only",
+      "breakpoints": true
     }
   ]
 }
