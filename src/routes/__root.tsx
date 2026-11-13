@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -123,11 +124,15 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  // Replace the exiting outlet tree as one unit at the public/auth boundary.
+  const childRouteId = useRouterState({
+    select: (state) => state.matches[1]?.routeId ?? "__root__",
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <AuthProvider><Outlet /></AuthProvider>
+      <AuthProvider key={childRouteId}><Outlet /></AuthProvider>
       <Toaster />
     </QueryClientProvider>
   );

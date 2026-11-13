@@ -10,6 +10,7 @@
 - [x] Replace stale audit claims; provide explicit PASS/FAIL/BLOCKED verification and numbered HUMAN REQUIRED checklist.
 
 ## Open — named blockers
+- [ ] Focused redirect regression (2026-11-13): reproduce desktop/mobile, investigate smallest safe fix, exercise repeat navigation/back/refresh and local-only sign-out, record evidence and commit without account/payment changes.
 - [ ] FAIL: repeated anonymous protected-route hard navigation produces recovered MatchView/routeId hydration errors in preview; needs framework/preview-runtime investigation, managed auth gate must not be bypassed.
 - [ ] BLOCKED: fresh deep security review — no callable trigger available; last persisted scan is complete but stale, request from Security.
 - [ ] HUMAN REQUIRED: real Google admin/student sign-in, sign-out/back navigation and student admin denial — account owners must consent; no separate student session available for autonomous read testing.

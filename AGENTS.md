@@ -41,3 +41,4 @@ use the editor.
 - Payment availability is computed by a shared readiness rule and independently enforced in the order transaction; approving a price is explicit and changing it clears approval. Why: temporary offers or incomplete receiving details must never open payment collection.
 - Browser profile updates are limited to display_name and revoked device checks cover every token in the same authenticated session. Why: identity spoofing and token rotation must not bypass trusted account/session boundaries.
 - Mutating integration checks require explicit opt-in; default verification uses the current injected session for read-only checks only. Why: preserve real users and financial/access records during audits.
+- Key the root AuthProvider/outlet subtree by its immediate child route, not pathname; this atomically replaces departed public/protected trees during hydration while preserving protected sibling state and the managed auth gate.
