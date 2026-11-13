@@ -1,11 +1,16 @@
 # AI Marketing Academy — focused launch roadmap
 
-## Current follow-up (2026-11-13, 19:05 UTC)
+## Current implementation (2026-11-13, 21:35 UTC)
+- [x] Implement explicit read-only playback checks, session-aware device guidance and account cache isolation.
+- [x] Add deterministic non-mutating role/session/device/payment/SQL tests: 38 PASS / 1 mutating SKIP; desktop/mobile privacy regression PASS.
+- [x] Verify automatic diagnostics OK, basic scan and 54 dependencies clean; update evidence/human checklist without live-data or infrastructure changes.
+
+## Historical follow-up (2026-11-13, 19:05 UTC)
 - [x] Review current logs, injected read-only admin pages, public publication status and anonymous privacy; repeat redirect regression passes with zero errors.
 - [x] Clarify manual device onboarding and verify desktop/mobile learning-to-Devices navigation; full 19 tests pass, one mutating test skipped; basic/dependency checks pass.
 - [x] Update evidence and post-OAuth human checklist; preserve records, publication settings and DNS.
-- [ ] UNKNOWN: who/how/when site became public — current public URL/settings verified, available metadata/logs expose no publication event or actor; owner visibility review required.
-- [ ] BLOCKED: published private RPC endpoint proof — copied localhost identifiers returned generic 500, not auth envelopes; published signed-in testing not established.
+- [x] Historical UNKNOWN: who/how/when site became public — current public URL/settings verified, available metadata/logs expose no publication event or actor; owner visibility review required.
+- [x] Published private RPC check deferred: owner unpublished, settings confirmed false; historical copied identifiers returned 500, not auth proof. Recheck actual deployed identifiers only if owner later authorizes publishing.
 
 ## Completed (2026-11-13)
 - [x] Preserve existing Option 2 V3 English-only white/black Inter pages, Google-only login and 3-photo/6-second slider; no publication/DNS changes.
@@ -26,4 +31,4 @@
 - [ ] BLOCKED: private signed-stream provider and real lessons — 0 lessons; getLearning intentionally unavailable; no resume/seek/completion or signed video delivery claim.
 - [ ] HUMAN REQUIRED after provider: Myanmar no-VPN desktop/mobile playback, backup/isolated restore and owner acceptance.
 
-Publication/deployment/audience changes and DNS cutover are explicitly OUT OF SCOPE. Site is already public at https://codebase-new-home-journey.lovable.app; this task did not change that status. No existing data import required; preserve all existing accounts and records.
+Publication/deployment/audience changes and DNS cutover are explicitly OUT OF SCOPE. Owner reports unpublishing; current settings confirm is_published=false (saved audience remains public, not an active publication). Keep current Lovable Cloud and existing database; no external migration. Preserve all existing accounts and records.

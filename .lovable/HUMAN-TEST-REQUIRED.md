@@ -6,7 +6,15 @@
 Preview base: https://id-preview--57ce9992-64d0-4435-8a61-143476b51606.lovable.app
 Use the Lovable preview when access is restricted; Google consent and 2FA belong to the account owner. Never share password, cookies or codes in chat.
 
-## Current follow-up — 2026-11-13, 19:15 UTC
+## Current status — 2026-11-13, 21:42 UTC
+- **UNPUBLISHED CONFIRMED:** owner unpublished; settings is_published=false. Saved public audience is not a live publication. Keep current Cloud/database; no external migration. Do not publish/deploy/change domain/visibility.
+- **PASS automated:** 38 tests, 1 live-mutating test skipped; automatic compilation OK; desktop/mobile repeated redirects, exact anonymous private-function denial, private-table denial, read-only injected admin checklist/device guidance and closed payment views. Basic/dependency scans pass; reviewed linter flags remain, deep review not refreshed.
+- **USER CONFIRMED:** own Google login works only. Available injected session lacks a device session claim; cannot substitute for real device or logout checks.
+- **DEVICE CHANGES:** browsing never registers. Choose Devices explicitly; playback check no longer consumes a slot. Removed session must Sign out then complete Google sign-in again; clearing academy-device cannot bypass revocation. New login uses a new session; an old active slot remains until owner removes it. Register control is disabled with clear guidance for missing/revoked session; current-session flags reveal no raw session IDs.
+- **HUMAN REQUIRED:** #1 real admin login/pages, #2 consenting second real student denial and real logout/server invalidation/account-switch stale-data check, #3 two browsers/third denied/concurrent limit, #4 real revocation and new-session recovery. Never send credentials or test another person without consent.
+- **BLOCKED:** approved real payment terms/instructions and legitimate financial records (#5–8), signed provider/real lessons/expiry (#9), Myanmar actual streaming (#10), deep review/isolated backup restore (#11). Admin Settings now shows Launch blocked and action checklist; no settings were changed.
+
+## Historical follow-up — 2026-11-13, 19:15 UTC (superseded)
 - **USER-CONFIRMED PASS: own Google sign-in only.** Admin access, student denial, registration and real server logout are separate checks; do not mark them passed from that confirmation.
 - **PUBLICATION DISCREPANCY / OWNER REVIEW REQUIRED:** site is currently public at https://codebase-new-home-journey.lovable.app, independently confirmed by settings and anonymous HTTP 200. Who/how/when it was published is unknown from available logs. Prior agent statements are not proof the site was unpublished. This task changed no audience/publication/DNS setting. Owner reviews whether PUBLIC visibility is intended; any change requires a separate explicit instruction.
 - **Current state:** 4 accounts/profiles, 1 admin, 0 active browser registrations/orders/enrollments/published lessons; no approved payment-ready course or receiving instructions. Payments and actual lesson playback remain closed.
@@ -31,7 +39,8 @@ Use the Lovable preview when access is restricted; Google consent and 2FA belong
 1. Separate real student owner signs in at the same /auth URL and opens /dashboard, /my-courses, /payments, /devices, /redeem.
 2. Directly open /admin, /admin/settings and /admin/payments.
 3. Sign out, press Back, refresh /dashboard and repeatedly open protected URLs in the same tab.
-4. Repeat the hard-entry sequence `/dashboard`, `/payments`, `/devices`, `/redeem`, `/admin`, `/admin/settings`, `/admin/payments` three times in one browser context; refresh after each redirect. Repeat on desktop and mobile. A qualified tester checks browser errors and confirms the signed-out session cannot call private read functions.
+4. With consenting owners, sign out and sign in as the second account: no previous account records may appear, even briefly on Back or refresh. Do not impersonate or share credentials.
+5. Repeat the hard-entry sequence `/dashboard`, `/payments`, `/devices`, `/redeem`, `/admin`, `/admin/settings`, `/admin/payments` three times in one browser context; refresh after each redirect. Repeat on desktop and mobile. A qualified tester checks browser errors and confirms the signed-out session cannot call private read functions.
 **PASS:** student can read only own workspace, admin denied, signed-out browser lands on /auth without protected content, stale records or rendering errors; real server logout revokes the session. **FAIL:** private/admin data visible, stale Back content, sign-in fails, repeated redirect/rendering error or revoked session still accepted.
 **Automated follow-up 2026-11-13:** previous `MatchView/routeId` FAIL reproduced, then zero errors with the small outlet-boundary fix on desktop/mobile, repeated hard entry/refresh, local-only Sign out, Back and negative private reads. The automated logout intercepts remote revocation to avoid touching the owner's real session; **actual server logout and Google/student tests still require the owners**. Do not dismiss recovery as a clean run if it reappears.
 

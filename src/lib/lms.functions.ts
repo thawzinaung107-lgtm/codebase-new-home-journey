@@ -17,9 +17,11 @@ export const getPublicAcademy = createServerFn({method:'GET'}).handler(async () 
 });
 export const getStudent = createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).handler(async({context})=>{
   const db=context.supabase;
-  const [profile,roles,enrollments,orders,devices,progress] = await Promise.all([db.from('profiles').select('*').eq('id',context.userId).single(),db.from('user_roles').select('role').eq('user_id',context.userId),db.from('enrollments').select('*').eq('user_id',context.userId),db.from('orders').select('*').eq('user_id',context.userId).order('created_at',{ascending:false}),db.from('registered_devices').select('id,user_id,name,created_at,last_seen,revoked_at').eq('user_id',context.userId).order('created_at'),db.from('lesson_progress').select('*').eq('user_id',context.userId)]);
+   const [profile,roles,enrollments,orders,devices,progress] = await Promise.all([db.from('profiles').select('*').eq('id',context.userId).single(),db.from('user_roles').select('role').eq('user_id',context.userId),db.from('enrollments').select('*').eq('user_id',context.userId),db.from('orders').select('*').eq('user_id',context.userId).order('created_at',{ascending:false}),db.from('registered_devices').select('id,user_id,name,created_at,last_seen,revoked_at,session_id').eq('user_id',context.userId).order('created_at'),db.from('lesson_progress').select('*').eq('user_id',context.userId)]);
   for(const r of [profile,roles,enrollments,orders,devices,progress]) if(r.error) throw new Error(r.error.message);
-  return {profile:profile.data,admin:roles.data?.some(r=>r.role==='admin')??false,enrollments:enrollments.data??[],orders:orders.data??[],devices:devices.data??[],progress:progress.data??[]};
+  const session = context.claims['session_id'];
+  const safeDevices = (devices.data??[]).map(({session_id,...device})=>({...device,current_session:typeof session==='string'&&session_id===session}));
+  return {profile:profile.data,admin:roles.data?.some(r=>r.role==='admin')??false,enrollments:enrollments.data??[],orders:orders.data??[],devices:safeDevices,deviceSession:typeof session!=='string'||!session?'unavailable' as const:safeDevices.some(d=>d.current_session&&d.revoked_at)?'revoked' as const:'available' as const,progress:progress.data??[]};
 });
 const deviceSchema=z.object({token:z.string().min(32).max(100),name:z.string().trim().min(1).max(100)});
 export const registerDevice=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(deviceSchema).handler(async({data,context})=>{

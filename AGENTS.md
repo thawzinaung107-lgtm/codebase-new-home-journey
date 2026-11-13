@@ -42,3 +42,6 @@ use the editor.
 - Browser profile updates are limited to display_name and revoked device checks cover every token in the same authenticated session. Why: identity spoofing and token rotation must not bypass trusted account/session boundaries.
 - Mutating integration checks require explicit opt-in; default verification uses the current injected session for read-only checks only. Why: preserve real users and financial/access records during audits.
 - Key the root AuthProvider/outlet subtree by its immediate child route, not pathname; this atomically replaces departed public/protected trees during hydration while preserving protected sibling state and the managed auth gate.
+- Auth identity transitions cancel and clear Query caches before exposing the new account; same-account token refresh preserves cache. Why: unscoped query keys must not leak previous-account records.
+- Device reads return current-session booleans, never session IDs; playback availability checks are read-only and registration remains an explicit Devices action. Why: onboarding must not silently consume slots or expose session identifiers.
+- Launch readiness must keep streaming blocked until a private provider is actually integrated; payment readiness alone never authorizes launch. Why: lesson metadata and stock samples are not protected playback.
