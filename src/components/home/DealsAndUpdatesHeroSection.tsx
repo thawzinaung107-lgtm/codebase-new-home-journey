@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { Pause, Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { academyQuery } from "@/lib/lms-query";
 import { SLIDE_INTERVAL_MS } from "@/lib/lms-rules";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import heroImg from "@/assets/myanmar-hero-desktop.png.asset.json";
+import strategyImg from "@/assets/myanmar-strategy-home-desktop.png.asset.json";
+import creationImg from "@/assets/myanmar-creation-home-desktop.png.asset.json";
 import { scrollToSection } from "./scroll";
 
 const slides = [
-  { title: "Find your next opportunity", body: "Course news and confirmed offers will appear here." },
-  { title: "AI Marketing Strategy", body: "Build your campaign planning, audience research and practical AI skills." },
-  { title: "AI Content Creation", body: "Explore practical AI tools for content and marketing assets." },
+  { title: "Find your next opportunity", body: "Course news and confirmed offers will appear here.", image: heroImg.url },
+  { title: "AI Marketing Strategy", body: "Build your campaign planning, audience research and practical AI skills.", image: strategyImg.url },
+  { title: "AI Content Creation", body: "Explore practical AI tools for content and marketing assets.", image: creationImg.url },
 ];
 const chip =
   "h-auto rounded-[10px] border-hero-chip-border bg-hero-chip p-3 text-sm font-normal leading-[21px] text-hero-foreground hover:bg-hero-chip-hover hover:text-hero-foreground";
@@ -20,7 +22,6 @@ const arrow =
 
 export function DealsAndUpdatesHeroSection() {
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
   const [reading, setReading] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [reduced, setReduced] = useState(false);
@@ -33,10 +34,10 @@ export function DealsAndUpdatesHeroSection() {
     return () => { document.removeEventListener('visibilitychange', visibility); media.removeEventListener('change', change); };
   }, []);
   useEffect(() => {
-    if (paused || reading || hidden || reduced) return;
+    if (reading || hidden || reduced) return;
     const timer = setInterval(() => setActive(a => (a + 1) % slides.length), SLIDE_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, [paused, reading, hidden, reduced]);
+  }, [reading, hidden, reduced]);
   const configured = data?.cms.find(s => s.key === `promotion-${active + 1}`);
   const slide = slides[active];
   return (
@@ -67,7 +68,7 @@ export function DealsAndUpdatesHeroSection() {
             role="img"
             aria-label="People discussing a course opportunity"
             className="h-[300px] min-w-0 rounded-xl bg-cover bg-center"
-            style={{ backgroundImage: `url("${configured?.image || heroImg.url}")` }}
+            style={{ backgroundImage: `url("${configured?.image || slide?.image || heroImg.url}")` }}
           />
         </div>
         <nav aria-label="Deals and updates slides" className="flex w-full items-center justify-between">
@@ -85,7 +86,6 @@ export function DealsAndUpdatesHeroSection() {
             ))}
           </div>
           <div className="inline-flex items-start gap-2">
-            <Button type="button" aria-label={paused ? 'Play slides' : 'Pause slides'} title={paused ? 'Play slides' : 'Pause slides'} onClick={() => setPaused(p => !p)} className={arrow}>{paused ? <Play /> : <Pause />}</Button>
             <Button type="button" aria-label="Previous slide" onClick={() => setActive((a) => (a === 0 ? slides.length - 1 : a - 1))} className={arrow}>
               <ChevronLeft />
             </Button>
