@@ -71,6 +71,13 @@
       "when": 1794610829599,
       "tag": "0009_bind_bunny_security_to_library",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794612466852,
+      "tag": "0010_simple_lesson_video_upload",
+      "breakpoints": true
     }
   ]
 }

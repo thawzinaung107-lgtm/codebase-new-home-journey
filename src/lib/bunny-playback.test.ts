@@ -8,7 +8,7 @@ describe('Bunny playback boundaries', () => {
   });
   it('expires exactly 300 seconds later using the required iframe host', async () => {
     const result = await signedEmbed('fixture-key', '759', '32d140e2-e4f4-4eec-9d53-20371e9be607', 1623439902000);
-    expect(result.expires).toBe(1623440202); expect(result.url).toContain('https://iframe.mediadelivery.net/embed/759/');
+    expect(result.expires).toBe(1623440202); expect(result.url).toContain('https://player.mediadelivery.net/embed/759/');
   });
   it('rejects absent signing secret', async () => { await expect(signedEmbed('', '759', '32d140e2-e4f4-4eec-9d53-20371e9be607')).rejects.toThrow(); });
   it('encrypts mappings and fails on the wrong secret', async () => {

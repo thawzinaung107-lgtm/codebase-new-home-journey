@@ -1,5 +1,13 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Simple lesson upload — 2026-11-13, 23:24 UTC request
+- [x] Admin → Courses → Lessons → Add lesson: title, optional description, drag/drop or file picker, optional order, auto-publish-when-ready; progress %, Cancel/Retry/Resume (also after reload), Processing→Ready polling, edit/reorder/publish/unpublish/delete with confirmation (Bunny video deleted only on explicit choice; empty unfinished uploads cleaned up). Default "Course Lessons" section created on first lesson. Old tools kept under Advanced.
+- [x] Official Bunny presigned TUS (SHA256(library+apiKey+expire+videoId), 12-hour window, 4 headers, filetype/title metadata) direct from browser; admin-only server create/resign/status/delete; DB guards: publish requires ready mapped video, idempotent upload request, progress-protected delete.
+- [x] Manual 24-hour security checkboxes retired; automated provider probe live: unsigned 403, expired 403, signed 200, foreign referrer 403, direct HLS 403, preview address allowed → PASS. Student playback re-probes automatically; player host moved to player.mediadelivery.net.
+- [x] 97 tests PASS / 1 live-mutating SKIP; build OK; 57 dependencies clean; anonymous redirect regression PASS desktop/mobile.
+- [ ] BLOCKED: admin screen not viewed in a browser (no admin test session available); first real upload, encoding, auto-publish and student signed playback not exercised (no file uploaded, 0 enrollments).
+- [ ] One-time when publishing: add the published site address to Bunny → Library → Security → Allowed domains (currently refused; preview allowed).
+
 ## Secure Bunny skeleton — 2026-11-13, 22:57 UTC request
 - [x] Applied additive managed migrations 0008/0009: private encrypted lesson mappings and admin-only security checks; explicit grants/RLS, draft-only mapping trigger, caller-JWT guarded playback function. No seed rows, lessons, enrollments or financial records created.
 - [x] Admin curriculum can load bounded paginated library title/GUID/processing status and assign/unassign a READY video to a saved draft lesson only after license acknowledgment and explicit confirmation. Provider lookup/library consistency checked; mappings encrypted with server-only token-key-derived AES-GCM (rotation requires remap). No uploads or provider mutations.

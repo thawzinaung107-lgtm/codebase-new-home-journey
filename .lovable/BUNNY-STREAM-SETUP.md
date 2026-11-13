@@ -1,5 +1,10 @@
 # Bunny Stream — API verified, protected playback blocked
 
+## Current workflow (23:24 UTC request) — supersedes manual checks below
+- Admin: Courses → Lessons → Add lesson → choose video → Upload lesson. Upload goes straight to Bunny via presigned TUS (12-hour window bound to one new video); progress, cancel/retry/resume, then Processing → Ready; publishes automatically when ready if chosen.
+- Security is checked automatically (no checkboxes): unsigned/expired links refused, signed links play, other sites refused, direct HLS refused. Last live probe: all PASS; preview address allowed; published address NOT yet allowed (one-time Bunny allowed-domains entry when publishing).
+- Not yet proven: a real upload → encode → student signed playback, and Myanmar no-VPN playback.
+
 Status: **LIBRARY API VERIFIED / PLAYBACK BLOCKED**. This document does not create a library, purchase service or authorize publication. Keep the existing Lovable Cloud/database and keep this project unpublished. Do not send keys in chat or commit credentials.
 
 ## Implemented secure skeleton — 22:57 UTC request

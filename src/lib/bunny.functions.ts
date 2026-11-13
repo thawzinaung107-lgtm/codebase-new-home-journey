@@ -41,6 +41,7 @@ export const mapBunnyVideo = createServerFn({ method: 'POST' }).middleware([requ
     if (!data.videoGuid) {
       const result = await context.supabase.from('lesson_bunny_videos').delete().eq('lesson_id', data.lessonId);
       if (result.error) throw new Error('Unmapping failed');
+      await context.supabase.from('lessons').update({ video_status: 'unconfigured' }).eq('id', data.lessonId);
       return { ok: true };
     }
     const { libraryRequest, bunnyConfig, safeVideo, encryptGuid, sha256 } = await import('./bunny-video.server');
@@ -49,18 +50,8 @@ export const mapBunnyVideo = createServerFn({ method: 'POST' }).middleware([requ
     if (!video.ready) throw new Error('Choose a ready video');
     const result = await context.supabase.from('lesson_bunny_videos').upsert({ lesson_id: data.lessonId, library_id: config.library, encrypted_video: await encryptGuid(video.guid, config.token), video_fingerprint: await sha256(config.library + ':' + video.guid) });
     if (result.error) throw new Error('Mapping failed; video may already be assigned');
+    await context.supabase.from('lessons').update({ video_status: 'ready', ...(video.length ? { duration_seconds: video.length } : {}) }).eq('id', data.lessonId);
     return { ok: true };
-  });
-
-export const recordBunnySecurity = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ embed_tokens: z.boolean(), preview_referrer: z.boolean(), unsigned_denied: z.boolean(), direct_media_denied: z.boolean(), acknowledged: z.literal(true) }))
-  .handler(async ({ data, context }) => {
-    await guard(context.supabase, context.userId);
-    const { acknowledged, ...checks } = data;
-    const { bunnyConfig } = await import('./bunny-video.server');
-    const r = await context.supabase.from('bunny_security_checks').upsert({ id: true, library_id: bunnyConfig().library, ...checks, verified_at: new Date().toISOString() });
-    if (r.error) throw new Error('Security check could not be recorded');
-    return { ok: acknowledged };
   });
 
 export const getLessonPlayback = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
@@ -69,7 +60,17 @@ export const getLessonPlayback = createServerFn({ method: 'POST' }).middleware([
     setResponseHeader('Cache-Control', 'private, no-store');
     if (typeof context.claims['session_id'] !== 'string') return { available: false as const, reason: 'Sign in again before watching lessons' };
     const { hashValue } = await import('./lms-rules');
-    const r = await context.supabase.rpc('lms_bunny_playback_mapping', { p_lesson: data.lessonId, p_hash: await hashValue(data.browserToken) });
+    const hash = await hashValue(data.browserToken);
+    let r = await context.supabase.rpc('lms_bunny_playback_mapping', { p_lesson: data.lessonId, p_hash: hash });
+    if (r.error?.message?.includes('security configuration unverified')) {
+      // Device, session and identity already passed; refresh the automated provider probe, then re-check everything.
+      try {
+        const { probeSecurity, recordProbe } = await import('./bunny-video.server');
+        const result = await probeSecurity(null);
+        if (result) { const { supabaseAdmin } = await import('@/integrations/supabase/client.server'); await recordProbe(supabaseAdmin, result); }
+      } catch { /* fail closed below */ }
+      r = await context.supabase.rpc('lms_bunny_playback_mapping', { p_lesson: data.lessonId, p_hash: hash });
+    }
     if (r.error || !r.data?.[0]) return { available: false as const, reason: 'Playback blocked: verify course access, browser registration, lesson mapping and Bunny security checks' };
     try {
       const { bunnyConfig, decryptGuid, libraryRequest, safeVideo, signedEmbed } = await import('./bunny-video.server');
@@ -78,7 +79,7 @@ export const getLessonPlayback = createServerFn({ method: 'POST' }).middleware([
       const videoId = await decryptGuid(mapping.encrypted_video, config.token);
       const video = safeVideo(await libraryRequest('/' + videoId), config.library);
       if (!video.ready) throw new Error('Video processing');
-      const fresh = await context.supabase.rpc('lms_bunny_playback_mapping', { p_lesson: data.lessonId, p_hash: await hashValue(data.browserToken) });
+      const fresh = await context.supabase.rpc('lms_bunny_playback_mapping', { p_lesson: data.lessonId, p_hash: hash });
       if (fresh.error || fresh.data?.[0]?.encrypted_video !== mapping.encrypted_video || fresh.data?.[0]?.library_id !== config.library) throw new Error('Access changed');
       return { available: true as const, ...await signedEmbed(config.token, config.library, video.guid) };
     } catch { return { available: false as const, reason: 'Mapped video or Bunny configuration unavailable' }; }

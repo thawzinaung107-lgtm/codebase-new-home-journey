@@ -82,7 +82,9 @@ export type Database = {
           embed_tokens: boolean
           id: boolean
           library_id: string | null
+          method: string
           preview_referrer: boolean
+          signed_allowed: boolean
           unsigned_denied: boolean
           verified_at: string
         }
@@ -91,7 +93,9 @@ export type Database = {
           embed_tokens?: boolean
           id?: boolean
           library_id?: string | null
+          method?: string
           preview_referrer?: boolean
+          signed_allowed?: boolean
           unsigned_denied?: boolean
           verified_at?: string
         }
@@ -100,7 +104,9 @@ export type Database = {
           embed_tokens?: boolean
           id?: boolean
           library_id?: string | null
+          method?: string
           preview_referrer?: boolean
+          signed_allowed?: boolean
           unsigned_denied?: boolean
           verified_at?: string
         }
@@ -257,6 +263,7 @@ export type Database = {
           lesson_id: string
           library_id: string
           updated_at: string
+          upload_expires_at: string | null
           video_fingerprint: string
         }
         Insert: {
@@ -264,6 +271,7 @@ export type Database = {
           lesson_id: string
           library_id: string
           updated_at?: string
+          upload_expires_at?: string | null
           video_fingerprint: string
         }
         Update: {
@@ -271,6 +279,7 @@ export type Database = {
           lesson_id?: string
           library_id?: string
           updated_at?: string
+          upload_expires_at?: string | null
           video_fingerprint?: string
         }
         Relationships: [
@@ -324,30 +333,39 @@ export type Database = {
       }
       lessons: {
         Row: {
+          auto_publish: boolean
+          description: string
           duration_seconds: number
           id: string
           module_id: string
           position: number
           status: string
           title: string
+          upload_request: string | null
           video_status: string
         }
         Insert: {
+          auto_publish?: boolean
+          description?: string
           duration_seconds?: number
           id?: string
           module_id: string
           position?: number
           status?: string
           title: string
+          upload_request?: string | null
           video_status?: string
         }
         Update: {
+          auto_publish?: boolean
+          description?: string
           duration_seconds?: number
           id?: string
           module_id?: string
           position?: number
           status?: string
           title?: string
+          upload_request?: string | null
           video_status?: string
         }
         Relationships: [
@@ -641,6 +659,24 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      lms_admin_create_upload_lesson: {
+        Args: {
+          p_auto_publish: boolean
+          p_course: string
+          p_description: string
+          p_position: number
+          p_request: string
+          p_title: string
+        }
+        Returns: {
+          created: boolean
+          lesson_id: string
+        }[]
+      }
+      lms_admin_delete_lesson: {
+        Args: { p_lesson: string }
+        Returns: undefined
       }
       lms_bunny_playback_mapping: {
         Args: { p_hash: string; p_lesson: string }
