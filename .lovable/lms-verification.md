@@ -15,10 +15,10 @@
 
 ## Not verified / still needed
 - The injected and freshly minted testing sessions do not contain an authentication session identifier. Device registration intentionally refuses these sessions instead of weakening the session binding. Verify create/read/revoke and third-device concurrency after a real Google sign-in.
-- No authorized admin account is supplied. Admin form writes, receipt approval/rejection, one-code issuance concurrency, successful redemption and learning progress round-trip remain pending authorized-admin testing and real course configuration.
-- Real prices, access days, private payment receipts and receiving instructions are not supplied; do not invent production values to claim checkout works.
-- Actual lesson videos and a Myanmar-tested approved streaming provider are not supplied. No live player, signed streaming, seek/resume end-to-end, video upload/transcoding, or no-VPN verification is claimed.
+- The supplied admin email is registered in the server-only allowlist. No account with that email exists yet; admin write checks await its first verified Google sign-in.
+- Temporary prices are 75,000 MMK for AI Marketing Strategy and 55,000 MMK for AI Content Creation. Access days and receiving instructions remain unconfigured, so real payments remain closed.
+- A separate public CC0 stock flower video is available on course details and learning pages. It is not a paid lesson and does not save lesson progress. Private signed streaming, seek/resume end-to-end, video upload/transcoding, and Myanmar no-VPN verification remain pending.
 - Hash-stored codes are displayed once to the admin for secure manual delivery. Admins can replace an unused code, invalidating its old value; this recovery operation still needs authorized-admin verification.
 - Redemption rate limiting is not implemented; Lovable has no standard backend limiter and an ad-hoc design needs an explicit tradeoff decision.
 - Exact matching against all 66 Figma screens is not verified. Current additions follow the Linear specification and existing visual system.
-- Existing users/data import, admin email list, approved public policy/support content, backup/restore verification, owner UAT, publication and DNS remain pending.
+- No existing users/data import is required per the owner. Approved public policy/support content, backup/restore verification, owner UAT, publication and DNS remain pending.

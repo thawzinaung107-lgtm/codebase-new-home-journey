@@ -34,4 +34,5 @@ use the editor.
 - LMS operations use authenticated TanStack server functions and transactional database functions for approval, redemption, device registration, and progress; RLS scopes reads and admin writes. Why: concurrency and permission rules must survive direct API calls.
 - A registered device is a browser token bound to an authenticated session ID; revoked sessions cannot silently re-register. Why: enforce the device limit without claiming reliable physical-device fingerprinting.
 - Public media and prices may be unavailable until approved; course playback stays unavailable until a private signed-streaming provider is configured. Why: never expose permanent lesson URLs or invent production offers.
+- Temporary stock footage is a separate public sample player, never a paid lesson or a substitute for signed course streaming. Why: enable sample playback without weakening enrollment and device controls.
 - Hash-stored codes are delivered once to the admin for manual forwarding; replacing an unused code invalidates its previous value. Why: recover failed delivery without storing readable codes.
