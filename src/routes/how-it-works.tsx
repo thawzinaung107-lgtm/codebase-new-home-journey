@@ -1,0 +1,5 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { PageShell } from '@/components/academy/PageShell';
+import { pageHead } from '@/lib/metadata';
+export const Route=createFileRoute('/how-it-works')({head:()=>pageHead('How it works','Google sign-in, manual payment, code redemption and self-paced learning.'),component:How});
+function How(){return <PageShell><h1 className="text-3xl font-semibold">From choosing a course to learning</h1><div className="mt-8 grid gap-8 md:grid-cols-2">{[['01','Choose your course','Browse the course details and confirmed enrollment information.'],['02','Sign in with Google','Use the same Google account for payments and learning.'],['03','Submit your payment','Follow the payment instructions and submit a private receipt for review.'],['04','Redeem and learn','After approval, enter your code to open your course for its access period.']].map(([n,title,body])=><div key={n} className="border-t py-6"><p className="text-sm text-muted-foreground">{n}</p><h2 className="mt-4 text-xl font-semibold">{title}</h2><p className="mt-3 text-sm text-muted-foreground">{body}</p></div>)}</div></PageShell>;}

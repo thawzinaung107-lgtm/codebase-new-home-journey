@@ -1,12 +1,16 @@
-import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { filterCourses } from "./courses";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { academyQuery } from "@/lib/lms-query";
+import { courses as courseImages } from "./courses";
 
 const dark = "h-auto rounded-[10px] border border-ink bg-ink p-3 text-sm font-normal leading-[21px] text-primary-foreground hover:bg-ink";
 
 export function CourseCatalogSection({ query, selectedFilter, onReset }: { query: string; selectedFilter: string; onReset: () => void }) {
-  const visible = filterCourses(query, selectedFilter);
+  const { data } = useSuspenseQuery(academyQuery);
+  const q = query.trim().toLowerCase();
+  const visible = data.courses.filter(c => (selectedFilter === 'All courses' || c.category === selectedFilter) && (!q || [c.title, c.description, c.category, courseImages.find(i => i.title === c.title)?.topics ?? ''].join(' ').toLowerCase().includes(q))).map((c, index) => ({ ...c, number: `COURSE ${String(index + 1).padStart(2, '0')}`, image: c.thumbnail || courseImages.find(i => i.title === c.title)?.image, titleClassName: courseImages.find(i => i.title === c.title)?.titleClassName || 'text-2xl leading-8' }));
   if (visible.length === 0) {
     return (
       <div className="flex w-full flex-col items-start gap-3 rounded-2xl border border-border bg-surface p-[22px]">
@@ -33,11 +37,10 @@ export function CourseCatalogSection({ query, selectedFilter, onReset }: { query
               <div className="w-[181px]"><dt className="sr-only">Access</dt><dd>Limited-term access</dd></div>
             </dl>
             <Button
-              type="button"
-              onClick={() => toast(`${c.title} is planned`, { description: "This course is planned for launch and is not open yet." })}
+              asChild
               className={`w-[157px] ${dark}`}
             >
-              View course
+              <Link to="/courses/$slug" params={{ slug: c.slug }}>View course</Link>
             </Button>
           </CardContent>
         </Card>

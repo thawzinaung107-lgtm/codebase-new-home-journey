@@ -8,6 +8,34 @@
       "when": 1794540609260,
       "tag": "0000_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794543507941,
+      "tag": "0001_lms_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794543566427,
+      "tag": "0002_lms_receipts_access_controls",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794543868923,
+      "tag": "0003_lms_admin_profiles_and_session_validation",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794544243191,
+      "tag": "0004_lms_reissue_code_and_device_session_guards",
+      "breakpoints": true
     }
   ]
 }

@@ -38,6 +38,9 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
   --color-background: var(--background);
+  --color-google-background: var(--google-background);
+  --color-google-foreground: var(--google-foreground);
+  --color-google-border: var(--google-border);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -88,6 +91,9 @@
 }
 
 :root {
+  --google-background: #ffffff;
+  --google-foreground: #1f1f1f;
+  --google-border: #747775;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.178 0 0);

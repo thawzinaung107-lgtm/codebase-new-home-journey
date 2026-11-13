@@ -31,3 +31,7 @@ use the editor.
 
 - Roles live in `public.user_roles` and are granted only by the `handle_new_user` auth trigger (student by default; admin via server-only `admin_emails` or a claimed `legacy_users` row) — never from client data. Why: prevents privilege escalation.
 - Users imported from the previous Replit app go into server-only `public.legacy_users` and are linked to a Cloud account on first verified Google sign-in by email. Why: keeps original IDs/roles without trusting the client.
+- LMS operations use authenticated TanStack server functions and transactional database functions for approval, redemption, device registration, and progress; RLS scopes reads and admin writes. Why: concurrency and permission rules must survive direct API calls.
+- A registered device is a browser token bound to an authenticated session ID; revoked sessions cannot silently re-register. Why: enforce the device limit without claiming reliable physical-device fingerprinting.
+- Public media and prices may be unavailable until approved; course playback stays unavailable until a private signed-streaming provider is configured. Why: never expose permanent lesson URLs or invent production offers.
+- Hash-stored codes are delivered once to the admin for manual forwarding; replacing an unused code invalidates its previous value. Why: recover failed delivery without storing readable codes.

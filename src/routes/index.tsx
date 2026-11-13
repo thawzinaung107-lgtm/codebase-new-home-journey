@@ -4,6 +4,7 @@ import { NavigationSection } from "@/components/home/NavigationSection";
 import { DealsAndUpdatesHeroSection } from "@/components/home/DealsAndUpdatesHeroSection";
 import { CourseSearchAndFiltersSection } from "@/components/home/CourseSearchAndFiltersSection";
 import { CourseCatalogSection } from "@/components/home/CourseCatalogSection";
+import { academyQuery } from "@/lib/lms-query";
 import {
   LearningPlatformFeaturesSection,
   LearningProcessStepsSection,
@@ -14,6 +15,7 @@ const description =
   "Practical AI marketing courses: AI Marketing Strategy and AI Content Creation. Self-paced recorded lessons with limited-term access.";
 
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(academyQuery),
   head: () => ({
     meta: [
       { title: "AI Marketing Academy" },

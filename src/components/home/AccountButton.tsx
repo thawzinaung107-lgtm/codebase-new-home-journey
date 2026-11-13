@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { Link } from "@tanstack/react-router";
 
 export function AccountButton() {
   const { user, loading } = useAuth();
@@ -34,12 +35,13 @@ export function AccountButton() {
     }
   }
 
+  if (user) return <Button asChild className="h-auto shrink-0 rounded-[10px] p-3"><Link to="/dashboard">My learning</Link></Button>;
   return (
     <Button
       type="button"
       onClick={handleAccount}
       disabled={busy || loading}
-      title={user ? `Signed in as ${user.email}` : "Sign in using Google only"}
+      title="Sign in using Google only"
       aria-busy={busy || loading}
       className="h-auto w-[147px] shrink-0 rounded-[10px] border border-ink bg-ink p-3 text-sm font-normal leading-[21px] text-primary-foreground hover:bg-ink"
     >
