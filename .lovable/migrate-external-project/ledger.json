@@ -1,0 +1,86 @@
+[
+ {
+  "capability": "Homepage (figma-design web app)",
+  "source": "artifacts/figma-design/client",
+  "outcome": "migrate",
+  "status": "verified",
+  "next_action": "none"
+ },
+ {
+  "capability": "Images",
+  "source": "client/public/figmaAssets",
+  "outcome": "migrate",
+  "status": "verified",
+  "next_action": "none"
+ },
+ {
+  "capability": "Google-only sign-in",
+  "source": "api-server/src/auth (direct Google OIDC)",
+  "outcome": "migrate to Lovable Cloud Google sign-in",
+  "status": "implemented",
+  "next_action": "User tries Google sign-in in preview"
+ },
+ {
+  "capability": "Profiles + roles schema",
+  "source": "lib/db lms_auth.users",
+  "outcome": "migrate (profiles + user_roles)",
+  "status": "done",
+  "next_action": "none"
+ },
+ {
+  "capability": "Admin role assignment",
+  "source": "LMS_ADMIN_EMAILS env",
+  "outcome": "migrate to server-only admin_emails table",
+  "status": "pending",
+  "next_action": "Owner supplies admin email list"
+ },
+ {
+  "capability": "Existing user records",
+  "source": "lms_auth.users",
+  "outcome": "migrate",
+  "status": "pending",
+  "next_action": "User exports users CSV from Replit Database"
+ },
+ {
+  "capability": "Sessions table",
+  "source": "lms_auth.sessions",
+  "outcome": "replaced by Lovable Cloud sessions",
+  "status": "accepted",
+  "next_action": "none; users sign in again"
+ },
+ {
+  "capability": "Health endpoint",
+  "source": "api-server/routes/health.ts",
+  "outcome": "migrate",
+  "status": "verified",
+  "next_action": "none"
+ },
+ {
+  "capability": "Academy promo film",
+  "source": "artifacts/ai-marketing-academy-promo",
+  "outcome": "pending",
+  "status": "pending",
+  "next_action": "Port animated film as separate page on request"
+ },
+ {
+  "capability": "Expo mobile app",
+  "source": "artifacts/ai-marketing-academy-mobile",
+  "outcome": "not supported (native apps)",
+  "status": "blocked",
+  "next_action": "Keep in Replit/Expo"
+ },
+ {
+  "capability": "Mockup sandbox",
+  "source": "artifacts/mockup-sandbox",
+  "outcome": "dev tool, not migrated",
+  "status": "accepted",
+  "next_action": "none"
+ },
+ {
+  "capability": "Verification",
+  "source": "-",
+  "outcome": "verify",
+  "status": "partial",
+  "next_action": "Real Google sign-in + imported user check after export"
+ }
+]

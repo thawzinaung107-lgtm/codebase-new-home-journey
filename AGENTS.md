@@ -28,3 +28,6 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- Roles live in `public.user_roles` and are granted only by the `handle_new_user` auth trigger (student by default; admin via server-only `admin_emails` or a claimed `legacy_users` row) — never from client data. Why: prevents privilege escalation.
+- Users imported from the previous Replit app go into server-only `public.legacy_users` and are linked to a Cloud account on first verified Google sign-in by email. Why: keeps original IDs/roles without trusting the client.
