@@ -30,7 +30,7 @@ export const revokeDevice=createServerFn({method:'POST'}).middleware([requireSup
   const r=await context.supabase.rpc('lms_revoke_device',{p_id:data.id}); if(r.error)throw new Error(r.error.message); return {ok:true};
 });
 export const redeemCode=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(z.object({code:codeSchema})).handler(async({data,context})=>{
-  const r=await context.supabase.rpc('lms_redeem',{p_hash:await hashValue(data.code)}); if(r.error)throw new Error(r.error.message); return {id:r.data};
+  const r=await context.supabase.rpc('lms_redeem',{p_hash:await hashValue(data.code)}); if(r.error)throw new Error(r.error.message); if(!r.data)throw new Error('Code unavailable or attempt limit reached. Check your code or try again in 15 minutes.'); return {id:r.data};
 });
 export const submitOrder=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(z.object({courseId:z.string().uuid(),receipt:z.string().max(500),reference:z.string().trim().max(200)})).handler(async({data,context})=>{
   if(!data.receipt.startsWith(context.userId+'/'))throw new Error('Invalid receipt');

@@ -483,6 +483,29 @@ export type Database = {
           },
         ]
       }
+      redemption_limits: {
+        Row: {
+          attempts: string[]
+          user_id: string
+        }
+        Insert: {
+          attempts?: string[]
+          user_id: string
+        }
+        Update: {
+          attempts?: string[]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "redemption_limits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registered_devices: {
         Row: {
           created_at: string

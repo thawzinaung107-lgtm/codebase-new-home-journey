@@ -36,3 +36,4 @@ use the editor.
 - Public media and prices may be unavailable until approved; course playback stays unavailable until a private signed-streaming provider is configured. Why: never expose permanent lesson URLs or invent production offers.
 - Temporary stock footage is a separate public sample player, never a paid lesson or a substitute for signed course streaming. Why: enable sample playback without weakening enrollment and device controls.
 - Hash-stored codes are delivered once to the admin for manual forwarding; replacing an unused code invalidates its previous value. Why: recover failed delivery without storing readable codes.
+- Redemption attempt limits are persisted and enforced inside the locked database transaction; failures return null instead of raising after counting. Why: direct calls and rolled-back failures must not bypass the limiter.
