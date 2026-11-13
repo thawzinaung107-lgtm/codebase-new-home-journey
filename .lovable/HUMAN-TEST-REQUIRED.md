@@ -22,7 +22,9 @@ Use the Lovable preview when access is restricted; Google consent and 2FA belong
 1. Separate real student owner signs in at the same /auth URL and opens /dashboard, /my-courses, /payments, /devices, /redeem.
 2. Directly open /admin, /admin/settings and /admin/payments.
 3. Sign out, press Back, refresh /dashboard and repeatedly open protected URLs in the same tab.
-**PASS:** student can read only own workspace, admin denied, signed-out browser lands on /auth without protected content or stale records. **FAIL:** private/admin data visible, stale Back content, sign-in fails, repeated redirect/rendering error. Current automated repeated-navigation check found recovered `MatchView/routeId` errors: record whether the real preview reproduces them. Do not dismiss recovery as a clean run.
+4. Repeat the hard-entry sequence `/dashboard`, `/payments`, `/devices`, `/redeem`, `/admin`, `/admin/settings`, `/admin/payments` three times in one browser context; refresh after each redirect. Repeat on desktop and mobile. A qualified tester checks browser errors and confirms the signed-out session cannot call private read functions.
+**PASS:** student can read only own workspace, admin denied, signed-out browser lands on /auth without protected content, stale records or rendering errors; real server logout revokes the session. **FAIL:** private/admin data visible, stale Back content, sign-in fails, repeated redirect/rendering error or revoked session still accepted.
+**Automated follow-up 2026-11-13:** previous `MatchView/routeId` FAIL reproduced, then zero errors with the small outlet-boundary fix on desktop/mobile, repeated hard entry/refresh, local-only Sign out, Back and negative private reads. The automated logout intercepts remote revocation to avoid touching the owner's real session; **actual server logout and Google/student tests still require the owners**. Do not dismiss recovery as a clean run if it reappears.
 
 ## 3. HUMAN REQUIRED — two browsers allowed, third denied
 Prerequisite: real student session and permission to change that student's registered browser slots; inspect existing slots first, do not delete another person's slots.

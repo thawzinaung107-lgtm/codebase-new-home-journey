@@ -8,10 +8,9 @@
 - [x] Run all tests: 19 PASS, one intentionally skipped mutating integration check; automatic preview compilation reports build OK.
 - [x] Verify public pages, existing injected authorized-admin read pages, closed payments, stock sample, six-second slider and desktop/mobile layouts; no impersonation or fabricated records.
 - [x] Replace stale audit claims; provide explicit PASS/FAIL/BLOCKED verification and numbered HUMAN REQUIRED checklist.
+- [x] Focused redirect bugfix: reproduce 42 recovered errors per desktop/mobile viewport, key immediate-child auth/outlet boundary, pass strict repeat entry/refresh/local-only sign-out/Back regression with zero errors; private student/admin reads still denied; 19 unit tests pass, automatic compilation OK.
 
 ## Open — named blockers
-- [ ] Focused redirect regression (2026-11-13): reproduce desktop/mobile, investigate smallest safe fix, exercise repeat navigation/back/refresh and local-only sign-out, record evidence and commit without account/payment changes.
-- [ ] FAIL: repeated anonymous protected-route hard navigation produces recovered MatchView/routeId hydration errors in preview; needs framework/preview-runtime investigation, managed auth gate must not be bypassed.
 - [ ] BLOCKED: fresh deep security review — no callable trigger available; last persisted scan is complete but stale, request from Security.
 - [ ] HUMAN REQUIRED: real Google admin/student sign-in, sign-out/back navigation and student admin denial — account owners must consent; no separate student session available for autonomous read testing.
 - [ ] HUMAN REQUIRED: two-browser allowed/third denied, concurrent registration and revoked-session token-rotation test — real session IDs and controlled device changes required.

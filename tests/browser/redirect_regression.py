@@ -94,11 +94,13 @@ async def exercise(browser, width, height):
             response = await context.request.post(url,
                 headers={"content-type": "text/plain", "origin": ORIGIN,
                          "sec-fetch-site": "same-origin", "x-tsr-serverFn": "true"})
-            # Managed middleware currently throws Error, serialized as 500 rather
-            # than 401. Require the exact auth failure, not merely any server error.
+            # Start returns an RPC error envelope (HTTP 200); middleware still
+            # denies access. Require an absent result and the exact auth error.
             response_text = await response.text()
-            print("Negative read diagnostic", response.status, response_text[:240])
-            assert response.status in (401, 500) and "Unauthorized: No authorization header provided" in response_text, f"Private read was not explicitly denied by auth (status {response.status})"
+            payload = json.loads(response_text)
+            values = dict(zip(payload["p"]["k"], payload["p"]["v"]))
+            assert values["result"] == {"t": 2, "s": 1}
+            assert values["error"]["s"]["message"]["s"] == "Unauthorized: No authorization header provided"
             denied += 1
         assert denied >= 2, "Must exercise both student and admin server authorization"
         print(f"PASS {width}: signed-in reads, local-only UI logout, Back, refresh; {denied} private calls denied")
