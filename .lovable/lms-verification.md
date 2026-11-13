@@ -1,28 +1,53 @@
-# Linear LMS verification
+# AI Marketing Academy — launch-blocker audit
 
-## Verified
-- Cloud migrations applied; new public tables and receipt access policies read back successfully.
-- Ten focused tests pass: existing course search, route matching, two-device threshold, three slides/six-second interval, access expiry/revocation, nonnegative price/positive duration, receipt validation, and concurrent invalid redemption calls.
-- Six concurrent unknown-code calls returned no enrollment; the persistent attempt array read back as exactly five timestamps. A further authenticated UI attempt displayed the denial/15-minute retry message.
-- Public execution of signup/audit/receipt trigger functions and anonymous role queries is revoked. Authenticated transactional functions retain their internal permission checks; server-only RLS tables intentionally have no browser policies.
-- The basic security scan passed after these changes. Deep code analysis is running against the pre-limiter saved revision; its results remain pending, not a clean security verdict.
-- Stock video playback advanced successfully without a video error, temporary pricing appeared, and the 620px course page had no horizontal overflow or runtime errors.
-- Public course navigation reaches the actual course-detail page.
-- Authenticated student dashboard loads through the running app.
-- Student admin navigation is denied by a server role check.
-- Unknown redeem codes are denied both through the UI and directly through the database transaction.
-- Unconfigured payments show no fabricated price or receiving instructions.
-- Forged device session identifiers are rejected.
-- Student reads of orders/enrollments/devices/progress are ownership-scoped; code hashes are not returned to students.
-- Desktop and 390px mobile homepage captured; no horizontal overflow or runtime page errors in the browser check.
-- Preview build reports build OK.
+**Audit: 2026-11-13 UTC. Overall: NOT READY FOR LAUNCH. No publication, deployment or DNS change requested/performed.**
 
-## Not verified / still needed
-- The injected and freshly minted testing sessions do not contain an authentication session identifier. Device registration intentionally refuses these sessions instead of weakening the session binding. Verify create/read/revoke and third-device concurrency after a real Google sign-in.
-- The supplied admin email is registered in the server-only allowlist. No account with that email exists yet; admin write checks await its first verified Google sign-in.
-- Temporary prices are 75,000 MMK for AI Marketing Strategy and 55,000 MMK for AI Content Creation. Access days and receiving instructions remain unconfigured, so real payments remain closed.
-- A separate public CC0 stock flower video is available on course details and learning pages. It is not a paid lesson and does not save lesson progress. Private signed streaming, seek/resume end-to-end, video upload/transcoding, and Myanmar no-VPN verification remain pending.
-- Hash-stored codes are displayed once to the admin for secure manual delivery. Admins can replace an unused code, invalidating its old value; this recovery operation still needs authorized-admin verification.
-- Redemption limiting is implemented in the locked database transaction: at most five attempts per rolling fifteen minutes, bounded timestamp storage, no readable codes. Window reset and successful-code/concurrency workflows still require further authorized checks.
-- Exact matching against all 66 Figma screens is not verified. Current additions follow the Linear specification and existing visual system.
-- No existing users/data import is required per the owner. Approved public policy/support content, backup/restore verification, owner UAT, publication and DNS remain pending.
+## Actual changes
+- Added explicit `courses.price_approved=false`. Existing 75,000/55,000 MMK prices preserved, not approved; access durations remain NULL; no receiving instructions invented.
+- Shared payment-readiness check in public course details, student Payments, admin Payments and Settings. Payment calls are independently gated in the database. Closed offers no longer show “Continue to payment”; anonymous enrollment/code actions ask for sign-in. Admins see missing owner-approved price, access duration and published receiving instructions. Editing a price clears approval; blank receiving instructions cannot be published through the app.
+- Limited browser profile updates to display name; email/legacy linkage cannot be spoofed through profile updates. No role assignment changed.
+- Device registration now rejects every token in a revoked authenticated session, including a newly rotated browser token, and validates session/hash/name before locking/counting the two slots.
+- Direct code issuance requires an existing assignee and a published course with configured duration. Redemption requires that assignee; lock-wait time is accounted for before expiry checks and attempt timestamps. Five attempts/rolling fifteen minutes preserved.
+- Updated Zod to 4.6.6, pinned transitive Zod 4.6.6, Seroval 1.6.11, js-yaml 4.3.2 and source-map-js 1.2.2. Router/Start versions unchanged.
+- Added four payment readiness and six database invariant regressions. The existing mutating redemption integration test now requires `LMS_ALLOW_MUTATING_TESTS=true`, so normal audits do not consume a real user's code-attempt allowance.
+
+## PASS — concrete evidence
+| Check | Result / evidence |
+|---|---|
+| Automatic preview compilation/type diagnostics | Latest `/tmp/observability/build-errors.log`: build OK at 11:15:16 UTC. Harness runs compilation/type checks; no manual duplicate build/typecheck invoked. Hosted saved-preview status showed successful older revision, not proof of these uncommitted edits. |
+| Existing + new tests | `bunx vitest run`: 19 passed, 1 skipped, five passing files. Skipped test intentionally mutates redemption limits. SQL invariant tests check actual migration text, **not** transactional end-to-end execution. |
+| Production dependencies | Final dependency scan: no known vulnerabilities among 54 checked production dependencies. Does not cover all development dependencies or prove absence of unknown vulnerabilities. |
+| Basic security | Repeated current basic scan: no issues found. |
+| Database state | Read back: all 16 public tables RLS enabled; 2 courses, 2 profiles, 1 admin, 0 orders/enrollments/lessons; private receipt bucket 10,485,760 bytes. Price approval false on both courses, NULL durations. |
+| Database guards applied | Live read-back: trusted profile writes false, display-name write true; revoked-session and payment-approval guard present. |
+| Hosted auth settings | Read `/auth/v1/settings`: Google enabled, email/password false, anonymous false, signup allowed. No credentials recorded. Google consent/2FA not executed. |
+| Role/account | One verified allowlisted account has admin role. Existing requester-injected session reports own admin true; admin Settings, Payments and course edit load via running app. **No mint, impersonation, fake user or role change.** |
+| Data API negative reads | Anonymous reads of 11 private tables denied (permission rejection or empty result). Authenticated direct reads of admin_emails, legacy_users, redeem_codes and redemption_limits denied. Own-role RPC succeeds; other-account role RPC returns false. |
+| Public pages | `/`, `/courses`, both actual course detail URLs, `/about`, `/how-it-works`, `/faq`, `/auth` render. Leaf titles/description/OG metadata inspected; bundled images are relative, so no invented OG image URL. |
+| Anonymous route access | Direct `/dashboard`, `/payments`, `/devices`, `/redeem`, `/admin`, `/admin/settings`, `/admin/payments` redirect to `/auth`, with recovery errors noted below. No private data displayed. |
+| Payment UX end-to-end read | Signed-in Payments displays “Payment is not open yet”; no receipt input. Both course pages have disabled “Payment not open”, no payment continuation link. Admin readiness shows all three missing prerequisites. Course edit approval checkbox unchecked; no save performed. |
+| Design/mobile | Desktop 1280×1800 and mobile 390×844: homepage, course details, auth and admin Settings checked; no horizontal overflow. White/black Inter retained. Three distinct slides advance at six seconds; no play/pause control. |
+| Sample only | Public stock video currentTime advances without video error. It is explicitly a sample, not a protected course lesson and does not save progress. Unentitled learning shows inactive course access. |
+
+Browser evidence: `/tmp/browser/launch-audit/preview-result.log`, `check_preview.py`, `check_readonly_security.py`, desktop/mobile/admin screenshots. These are temporary sandbox evidence, not durable deliverables; findings above are the durable record. No tokens/cookies included.
+
+## FAIL — unresolved runtime signal
+- Repeated anonymous hard navigation to protected pages in the same browser context emits recovered React errors on `/auth`: `MatchView: Cannot read properties of undefined (reading routeId)` in the preview runtime. Page eventually renders sign-in and no protected data leaks. Isolated fresh-browser `/dashboard` -> `/auth` did not reproduce it; repeated-navigation script did. **Do not claim zero runtime errors or launch readiness.** Managed auth gate and framework internals were not bypassed or patched to conceal this. Requires framework/preview-runtime investigation; manual hard-refresh/back-navigation check in checklist #2.
+
+## Reviewed linter findings — not suppressed
+- 4 INFO no-policy tables: admin_emails, legacy_users, redeem_codes, redemption_limits. Intentional server-only deny-by-default; do not add browser policies just to clear warnings.
+- 11 WARN callable security-definer functions: has_role, lms_issue_code, lms_manage_access, lms_redeem, lms_register_device, lms_reissue_code, lms_review_order, lms_revoke_code, lms_revoke_device, lms_save_progress, lms_submit_order. Reviewed fixed public search_path, explicit caller checks/ownership, anonymous execution revocation, transactional locking, and grants. Their signed-in execution is necessary; linter is not proof of successful operations. Student/admin separation still needs a real student session.
+- Receipt insert/read/delete policies: owner prefix, allowed filename extensions; owner/admin reads; deletion limited to unsubmitted owner receipts; order trigger checks object existence, nonzero size <=10 MiB and MIME png/jpeg/pdf. Signed URLs expire after 60 seconds. Actual cross-user uploaded file reads/expiry remain BLOCKED: no real receipts, and no fake upload created.
+- Duplicate approval: row lock, unique order code and approved retry lookup present. Admin operations checked in database, not only client. Successful duplicate/concurrent approval remains BLOCKED without a legitimate order.
+- Role changes: role tables not browser-writable, has_role checks current database roles and only current caller. Existing grant was preserved. Signup trigger checks verified email and server allowlist, but lifecycle only has INSERT trigger: adding an already-existing account to allowlist does not auto-promote on later sign-in. Do not assert otherwise or add login-time arbitrary grants.
+
+## BLOCKED / HUMAN REQUIRED
+1. Real Google consent/2FA, admin re-login and student denial: must be performed by account owners. Injected admin read test is not an OAuth test; no student session available without taking over a different account.
+2. Two-browser/third-browser concurrency, revoke/rotated-token denial and session invalidation: need real Google sessions; no device records created by this audit.
+3. Approved real prices, access durations, published receiving instructions and support/legal content: owner supplies/approves; existing prices stay temporary. Do not collect real payments merely to test.
+4. Receipt submission/read/expiry, review/rejection/duplicate approval, code delivery/replacement/redemption concurrency and rolling window reset: need legitimate records + approved controlled-test authorization. No real/fake payment, approval or code created here.
+5. Secure streaming, actual lessons, resume/completion and Myanmar no-VPN: provider and real lesson videos absent; `getLearning` still always returns unavailable. Stock sample does not satisfy this.
+6. Fresh deep scan: tools expose basic/dependency/results only; attempted discovery found no callable deep-scan trigger. Last persisted deep scan completed 05:15:41 UTC with no findings, **up_to_date=false**. Not pending and not a clean current-code verdict. Request fresh deep review from Security before launch.
+7. Backup/restore verification and owner acceptance: human-operated isolated restore and acceptance needed; never restore over existing production records.
+
+See [HUMAN-TEST-REQUIRED.md](./HUMAN-TEST-REQUIRED.md) for numbered prerequisites, preview links, steps and PASS/FAIL outcomes.

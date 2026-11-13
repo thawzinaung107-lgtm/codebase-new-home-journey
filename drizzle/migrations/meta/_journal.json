@@ -50,6 +50,13 @@
       "when": 1794546965350,
       "tag": "0006_has_role_caller_only",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794568152420,
+      "tag": "0007_launch_payment_and_session_guards",
+      "breakpoints": true
     }
   ]
 }

@@ -110,6 +110,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          price_approved: boolean
           price_mmk: number | null
           slug: string
           status: string
@@ -122,6 +123,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          price_approved?: boolean
           price_mmk?: number | null
           slug: string
           status?: string
@@ -134,6 +136,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          price_approved?: boolean
           price_mmk?: number | null
           slug?: string
           status?: string

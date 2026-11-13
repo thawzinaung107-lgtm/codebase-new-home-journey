@@ -1,16 +1,22 @@
-# Linear LMS implementation
+# AI Marketing Academy — focused launch roadmap
 
-- [x] Configure supplied admin email, temporary course prices, and stock sample playback; draft the remaining security-check plan.
+## Completed (2026-11-13)
+- [x] Preserve existing Option 2 V3 English-only white/black Inter pages, Google-only login and 3-photo/6-second slider; no publication/DNS changes.
+- [x] Audit live 16-table RLS, private receipt policies, transactional admin authorization, role ownership, device session binding, redemption locks and rate limits.
+- [x] Fix explicit payment approval/readiness, revoked-session token rotation, profile identity writes, code-assignee validation and lock-wait expiry checks; verify applied guards read back.
+- [x] Update vulnerable dependencies; final scan reports none among 54 production dependencies.
+- [x] Run all tests: 19 PASS, one intentionally skipped mutating integration check; automatic preview compilation reports build OK.
+- [x] Verify public pages, existing injected authorized-admin read pages, closed payments, stock sample, six-second slider and desktop/mobile layouts; no impersonation or fabricated records.
+- [x] Replace stale audit claims; provide explicit PASS/FAIL/BLOCKED verification and numbered HUMAN REQUIRED checklist.
 
-- [x] Read the project, current design document, PRD, security blueprint, and development issues from Mauran's Linear.
-- [x] Implement latest Option 2 V3 public pages and three-slide, six-second promotion slider.
-- [x] Implement protected student dashboard, course details, unavailable/expired learning states, payments, redemption, and device management screens.
-- [x] Implement protected admin courses/lessons, payments/codes, students/access/devices, CMS/settings, and audit/reporting screens.
-- [x] Implement Cloud schema, private receipts, atomic payment approval/redemption, enrollment expiry, progress operations, and two-device enforcement.
-- [ ] Verify successful student/admin write flows and concurrency — needs an authorized admin account, real Google session with session ID, and course/payment configuration; public routes, signed-in dashboard, denied admin access, invalid codes, data isolation, and desktop/mobile checks passed.
-- [x] Implement replacement of unused codes for manual-delivery recovery; authorized-admin verification remains pending.
-- [x] Implement persistent redemption rate limiting; six concurrent invalid calls persisted exactly five attempts, and the UI displayed the denial message.
-- [ ] Finish security verification — deep scan results pending; window-reset/successful redemption checks and real Google/admin/payment flows remain blocked by session/account and receiving-detail/access-period setup.
-- [ ] Finish secure video delivery after approved provider and real lesson videos are supplied.
-- [x] Register supplied admin email; no existing-data import is required per the owner.
-- [ ] Complete Myanmar no-VPN playback tests, backup/restore checks, owner UAT, and approved publication/domain cutover.
+## Open — named blockers
+- [ ] FAIL: repeated anonymous protected-route hard navigation produces recovered MatchView/routeId hydration errors in preview; needs framework/preview-runtime investigation, managed auth gate must not be bypassed.
+- [ ] BLOCKED: fresh deep security review — no callable trigger available; last persisted scan is complete but stale, request from Security.
+- [ ] HUMAN REQUIRED: real Google admin/student sign-in, sign-out/back navigation and student admin denial — account owners must consent; no separate student session available for autonomous read testing.
+- [ ] HUMAN REQUIRED: two-browser allowed/third denied, concurrent registration and revoked-session token-rotation test — real session IDs and controlled device changes required.
+- [ ] BLOCKED: real prices approved, access durations, receiving instructions, support/legal — owner-approved content absent; temporary 75k/55k unchanged, payments closed.
+- [ ] BLOCKED/HUMAN REQUIRED: legitimate receipt, approval/rejection/duplicate approvals, delivery/replacement/redemption concurrency/window reset/expiry — requires configuration and explicitly approved nonfabricated test transactions.
+- [ ] BLOCKED: private signed-stream provider and real lessons — 0 lessons; getLearning intentionally unavailable; no resume/seek/completion or signed video delivery claim.
+- [ ] HUMAN REQUIRED after provider: Myanmar no-VPN desktop/mobile playback, backup/isolated restore and owner acceptance.
+
+Publication/deployment and DNS cutover are explicitly OUT OF SCOPE. No existing data import required; preserve all existing accounts and records.

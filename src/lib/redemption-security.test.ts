@@ -4,7 +4,8 @@ const sessionText = process.env['LOVABLE_BROWSER_SUPABASE_SESSION_JSON'];
 const url = process.env['VITE_SUPABASE_URL'];
 const key = process.env['VITE_SUPABASE_PUBLISHABLE_KEY'];
 
-describe.skipIf(!sessionText || !url || !key)('authenticated redemption security', () => {
+// Explicit opt-in: this integration test consumes a real account's attempt allowance.
+describe.skipIf(process.env['LMS_ALLOW_MUTATING_TESTS'] !== 'true' || !sessionText || !url || !key)('authenticated redemption security', () => {
   it('rejects six concurrent unknown codes without granting enrollment', async () => {
     if (!sessionText || !url || !key) throw new Error('Authenticated test configuration missing');
     const session = JSON.parse(sessionText) as { access_token: string };

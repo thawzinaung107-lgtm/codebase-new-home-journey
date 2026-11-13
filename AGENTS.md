@@ -37,3 +37,7 @@ use the editor.
 - Temporary stock footage is a separate public sample player, never a paid lesson or a substitute for signed course streaming. Why: enable sample playback without weakening enrollment and device controls.
 - Hash-stored codes are delivered once to the admin for manual forwarding; replacing an unused code invalidates its previous value. Why: recover failed delivery without storing readable codes.
 - Redemption attempt limits are persisted and enforced inside the locked database transaction; failures return null instead of raising after counting. Why: direct calls and rolled-back failures must not bypass the limiter.
+
+- Payment availability is computed by a shared readiness rule and independently enforced in the order transaction; approving a price is explicit and changing it clears approval. Why: temporary offers or incomplete receiving details must never open payment collection.
+- Browser profile updates are limited to display_name and revoked device checks cover every token in the same authenticated session. Why: identity spoofing and token rotation must not bypass trusted account/session boundaries.
+- Mutating integration checks require explicit opt-in; default verification uses the current injected session for read-only checks only. Why: preserve real users and financial/access records during audits.
