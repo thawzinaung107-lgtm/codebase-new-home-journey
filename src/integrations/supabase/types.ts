@@ -76,6 +76,36 @@ export type Database = {
           },
         ]
       }
+      bunny_security_checks: {
+        Row: {
+          direct_media_denied: boolean
+          embed_tokens: boolean
+          id: boolean
+          library_id: string | null
+          preview_referrer: boolean
+          unsigned_denied: boolean
+          verified_at: string
+        }
+        Insert: {
+          direct_media_denied?: boolean
+          embed_tokens?: boolean
+          id?: boolean
+          library_id?: string | null
+          preview_referrer?: boolean
+          unsigned_denied?: boolean
+          verified_at?: string
+        }
+        Update: {
+          direct_media_denied?: boolean
+          embed_tokens?: boolean
+          id?: boolean
+          library_id?: string | null
+          preview_referrer?: boolean
+          unsigned_denied?: boolean
+          verified_at?: string
+        }
+        Relationships: []
+      }
       cms_sections: {
         Row: {
           body: string
@@ -220,6 +250,38 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
         }
         Relationships: []
+      }
+      lesson_bunny_videos: {
+        Row: {
+          encrypted_video: string
+          lesson_id: string
+          library_id: string
+          updated_at: string
+          video_fingerprint: string
+        }
+        Insert: {
+          encrypted_video: string
+          lesson_id: string
+          library_id: string
+          updated_at?: string
+          video_fingerprint: string
+        }
+        Update: {
+          encrypted_video?: string
+          lesson_id?: string
+          library_id?: string
+          updated_at?: string
+          video_fingerprint?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_bunny_videos_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: true
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lesson_progress: {
         Row: {
@@ -579,6 +641,13 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      lms_bunny_playback_mapping: {
+        Args: { p_hash: string; p_lesson: string }
+        Returns: {
+          encrypted_video: string
+          library_id: string
+        }[]
       }
       lms_issue_code: {
         Args: {
