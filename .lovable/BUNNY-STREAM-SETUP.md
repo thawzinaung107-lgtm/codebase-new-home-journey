@@ -1,8 +1,12 @@
-# Bunny Stream — owner setup, not connected
+# Bunny Stream — API verified, protected playback blocked
 
-Status: **UNCONFIGURED / PLAYBACK BLOCKED**. This document does not create a library, purchase service, connect Bunny, or authorize publication. Keep the existing Lovable Cloud/database and keep this project unpublished. Do not send keys in chat or commit credentials.
+Status: **LIBRARY API VERIFIED / PLAYBACK BLOCKED**. This document does not create a library, purchase service or authorize publication. Keep the existing Lovable Cloud/database and keep this project unpublished. Do not send keys in chat or commit credentials.
 
-Current read-only audit (2026-11-13, 22:30 UTC request): all three required named server settings below are missing; 0 lessons/published lessons and no private video GUID mapping, signer or Bunny upload workflow. Owner's library configuration is not independently verified. Nothing was uploaded or purchased.
+Current re-test (2026-11-13, 22:44 UTC request): `BUNNY_STREAM_LIBRARY_ID`, `BUNNY_STREAM_API_KEY`, `BUNNY_STREAM_TOKEN_KEY` are all present in managed secrets and server runtime. Library identifier is valid positive-integer configuration. Read-only Stream library videos GET returned HTTP 200 and 3 records; no video details or credentials exposed. The exact new server helper verified HTTP 200 at 22:46 UTC. Token key was never sent to API or browser; its presence is not proof of correctness. 0 LMS lessons/enrollments; no private GUID mapping, signer or upload workflow. Nothing uploaded/purchased, no records or publication settings changed. Earlier 22:30 missing-settings result is superseded.
+
+Admin Settings now contains **Bunny Stream connection → Check connection**. The authenticated server function verifies the caller's server-managed admin role before inspecting settings or performing GET; returns only booleans, sanitized HTTP/status and checked-at time, with no-store caching. It does not enable playback. Anonymous/current non-admin rejection tested; actual admin UI success and hosted deployed environment are HUMAN REQUIRED/unverified while unpublished. Local server helper success is not a deployment claim.
+
+Verification: 52 tests PASS / 1 live-mutating SKIP; automatic build OK, basic security clear and 56 production dependencies without known vulnerabilities; private-read and desktop/mobile redirect/MCP checks PASS. Owner must still confirm library token authentication, exact preview referrer, correct signing key, licensed video/lesson mapping and direct HLS/CDN protection. Myanmar no-VPN playback is HUMAN REQUIRED only after protected integration.
 
 ## 1. Create the library yourself when ready
 1. Sign in to your own Bunny account. Review current storage, delivery, minimum monthly usage, replication and optional DRM costs before proceeding. Creating/uploading may incur charges; nothing has been purchased by Lovable.

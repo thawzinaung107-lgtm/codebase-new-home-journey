@@ -1,5 +1,13 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Bunny credentials re-test — 2026-11-13, 22:44 UTC request
+- [x] Supersedes 22:30 missing-secrets result: all three exact Bunny names are now configured in managed secrets AND available to the server environment. Library ID passes positive-integer format check. Library API GET HTTP 200; response contained 3 video records despite itemsPerPage=1. No GUID/title/body/credential output or upload; signing key checked separately and never sent to API.
+- [x] Implement admin-only typed `getBunnyHealth`, checking caller role before reading environment or contacting Bunny; private/no-store response, sanitized booleans/status/timestamp only. Existing Admin Settings has explicit Check connection panel; no playback readiness change. Actual server helper API verification HTTP 200 at 22:46 UTC. Anonymous and current non-admin RPC denials PASS.
+- [x] 52 tests PASS / 1 live-mutating SKIP; automatic build OK; basic security clear; 56 dependencies without known vulnerabilities. Anonymous/private read tests and desktop/mobile MCP/redirect regression PASS. No existing users/payments/courses/lessons/enrollments changed; is_published=false verified.
+- [ ] HUMAN REQUIRED: real admin opens Settings → Bunny Stream connection → Check connection; admin success UI cannot be verified with current non-admin injected account. Hosted deployed runtime remains unverified because site stays unpublished; server environment/helper verified locally without deployment.
+- [ ] BLOCKED: 0 LMS lessons/enrollments, no private GUID mapping/upload workflow/protected signer. API video existence does not establish ownership/license or course mapping. Token-key presence does not prove correct signing key or enabled token authentication.
+- [ ] OWNER/HUMAN REQUIRED: verify Stream Security embed token auth, preview allowed referrer, direct HLS/CDN protection and licensed video mapping; protected 5-minute integration/device/access checks remain future work. Myanmar no-VPN playback follows actual protected integration. No release/publication/payment approval authorized.
+
 ## Current read-only audit — 2026-11-13, 22:30 UTC request
 - [x] Publication readback: is_published=false. Existing Cloud/database retained; no settings, DNS, accounts, course/payment records or Bunny resources changed.
 - [x] Current automatic build/type diagnostics: build OK at 22:34:30 UTC; preview health HTTP 200. Runtime/console telemetry files unavailable this turn. Dev server retains `Error: aborted` request-disconnect traces; no matching failure reproduced by current browser checks. No speculative app fix or manual production build/typecheck performed (harness owns these checks).
