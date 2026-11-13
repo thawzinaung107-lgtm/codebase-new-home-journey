@@ -6,6 +6,15 @@
 Preview base: https://id-preview--57ce9992-64d0-4435-8a61-143476b51606.lovable.app
 Use the Lovable preview when access is restricted; Google consent and 2FA belong to the account owner. Never share password, cookies or codes in chat.
 
+## Current follow-up — 2026-11-13, 19:15 UTC
+- **USER-CONFIRMED PASS: own Google sign-in only.** Admin access, student denial, registration and real server logout are separate checks; do not mark them passed from that confirmation.
+- **PUBLICATION DISCREPANCY / OWNER REVIEW REQUIRED:** site is currently public at https://codebase-new-home-journey.lovable.app, independently confirmed by settings and anonymous HTTP 200. Who/how/when it was published is unknown from available logs. Prior agent statements are not proof the site was unpublished. This task changed no audience/publication/DNS setting. Owner reviews whether PUBLIC visibility is intended; any change requires a separate explicit instruction.
+- **Current state:** 4 accounts/profiles, 1 admin, 0 active browser registrations/orders/enrollments/published lessons; no approved payment-ready course or receiving instructions. Payments and actual lesson playback remain closed.
+- **After your successful sign-in:** open Dashboard and use the ADMIN workspace link if authorized, then refresh Admin/Settings/Payments (#1). A separate real consenting student must check forbidden admin access (#2). Do not share account details or credentials here.
+- **Registration is manual:** 0 devices is normal before choosing Register this device on Devices. Complete #3 with owner-controlled real browsers; then #4. Available injected read-only session lacks a session_id and cannot substitute for this check.
+- **Real logout remains HUMAN REQUIRED:** use Sign out, Back, refresh and repeat protected links. A qualified authorized tester confirms old-session private calls are rejected without exposing tokens (#2); automated logout intercepts remote revocation and is not proof of this.
+- **Automated current PASS:** desktop/mobile repeat redirect regression and onboarding link navigation, 19 unit tests, no known production dependency vulnerabilities, basic scan. Deep review remains stale. Public private-function probes using localhost identifiers returned generic 500 errors, not verified auth denials; published signed-in flows remain unverified.
+
 ## Before you start
 - Current state: two temporary prices 75,000/55,000 MMK, **neither approved**, no access durations/receiving instructions, zero orders/enrollments/lessons. Payments must remain closed.
 - Existing authorized Google account: **phwayphway15000@gmail.com**. A separate real, owner-authorized student Google account is needed; do not impersonate an existing account.
