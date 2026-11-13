@@ -46,3 +46,5 @@ use the editor.
 - Device reads return current-session booleans, never session IDs; playback availability checks are read-only and registration remains an explicit Devices action. Why: onboarding must not silently consume slots or expose session identifiers.
 - Launch readiness must keep streaming blocked until a private provider is actually integrated; payment readiness alone never authorizes launch. Why: lesson metadata and stock samples are not protected playback.
 - Signed-in demo payment previews use static mock copy, not privileged reads of draft settings, and contain no payment controls. Why: unpublished receiving instructions must remain admin-only.
+- Agent integrations expose bounded read-only catalog and caller-owned learning tools via OAuth with a client claim and RLS; browser tools stay in their owning screens with static telemetry. Why: integrations must not bypass payment, device, administration or privacy controls.
+- Google OAuth returns through public /auth with a canonical local next path, then resumes consent after session hydration. Why: protected callbacks and unsafe return paths lose authorization or permit external redirects.

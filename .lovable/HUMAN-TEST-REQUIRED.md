@@ -6,6 +6,14 @@
 Preview base: https://id-preview--57ce9992-64d0-4435-8a61-143476b51606.lovable.app
 Use the Lovable preview when access is restricted; Google consent and 2FA belong to the account owner. Never share password, cookies or codes in chat.
 
+## Agent integration follow-up — 2026-11-13
+- Managed OAuth enabled on existing Cloud; asymmetric signing was already active. No new database or payment system; no publication or record mutations.
+- Read-only remote tools: published catalog and caller-owned enrollments/progress. Browser tools: current learning overview and registration status, without registering devices.
+- HUMAN REQUIRED / BLOCKED while unpublished: external client connection, actual Google return to consent, approve and deny, already-authorized redirect, expired authorization and retry after provider/action failures. Do not paste session tokens or credentials.
+- Existing device/logout/student/payment/streaming checks below remain open; integrations do not satisfy launch checks.
+- PASS: 2-tool manifest; 47 tests / 1 mutating SKIP; automatic compilation OK; 56 production dependencies clean. Desktop/mobile invalid/missing consent and local signed-in return verified; anonymous and copied non-OAuth sessions receive MCP 401. Browser native WebMCP API unavailable in test browser; normal pages work.
+- PASS anonymous redirect regression; BLOCKED historical signed-in admin assertion because current injected account is not established as the prior admin. No role changes or impersonation. Hosted Google callback allow-list and full OAuth grant flow require real client verification; no provider grants were fabricated.
+
 ## Authorized demo follow-up — 2026-11-13, 22:02 UTC
 - **PASS database/UI readback:** existing Strategy 75,000 MMK / 30 days and Creation 55,000 MMK / 60 days, statuses unchanged, both price_approved=false. Exact requested placeholder instructions saved using Admin Settings, refreshed and verified published=false. No receipts, orders, enrollments, codes, lessons, accounts or roles changed.
 - **PASS demo safety:** signed-in Payments shows static read-only DEMO copy, never reads admin draft details. No payment/upload controls; course buttons disabled. Public settings policy still requires published; draft is admin-only. Course prices/durations visibly temporary/DEMO, not real approved offers.

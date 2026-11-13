@@ -1,5 +1,13 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Agent integrations — 2026-11-13
+- [x] Enable managed OAuth on the existing Cloud; asymmetric signing already active, no key migration needed.
+- [x] Implement protected read-only catalog/own learning MCP plus browser-only overview/device status; no record mutations or payment/receipt/code tools.
+- [x] Preserve Google-only sign-in and safe consent return paths; retain all existing auth/device/payment gates.
+- [x] Catalog extraction: 2 protected tools. 47 unit tests PASS / 1 mutating SKIP; automatic compilation OK; 56 production dependencies clean. Desktop/mobile missing/invalid consent, signed-in return and anonymous/non-OAuth MCP rejection PASS.
+- [x] Anonymous repeated protected entry/refresh regression PASS at both viewports with zero console/page errors. Full historical regression BLOCKED at admin assertion: current injected account is not established as the prior admin; no account impersonation or role changes.
+- [ ] HUMAN REQUIRED: real external-client consent approve/deny, already-authorized redirect and new Google round-trip, including hosted redirect allow-list validation; no tool exposes that setting here. Unavailable externally while owner keeps app unpublished.
+
 ## Authorized demo configuration — 2026-11-13, 22:02 UTC
 - [x] Database readback: Strategy 75,000 MMK / 30 days; Creation 55,000 MMK / 60 days. Both catalog statuses remain published, both price_approved=false; site remains unpublished.
 - [x] Exact mock payment_instructions saved via existing Admin Settings UI and reloaded with published=false; public-read policy still requires published. Student preview uses static mock copy, not private draft queries.

@@ -16,6 +16,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDevicesRouteImport } from './routes/_authenticated/devices'
@@ -23,6 +25,7 @@ import { Route as AuthenticatedMyCoursesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedPaymentsRouteImport } from './routes/_authenticated/payments'
 import { Route as AuthenticatedRedeemRouteImport } from './routes/_authenticated/redeem'
 import { Route as CoursesSlugRouteImport } from './routes/courses_.$slug'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminCmsRouteImport } from './routes/_authenticated/admin.cms'
 import { Route as AuthenticatedAdminCodesRouteImport } from './routes/_authenticated/admin.codes'
@@ -67,6 +70,17 @@ const HowItWorksRoute = HowItWorksRouteImport.update({
   path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -100,6 +114,11 @@ const AuthenticatedRedeemRoute = AuthenticatedRedeemRouteImport.update({
 const CoursesSlugRoute = CoursesSlugRouteImport.update({
   id: '/courses_/$slug',
   path: '/courses/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
@@ -159,6 +178,8 @@ export interface FileRoutesByFullPath {
   '/courses': typeof CoursesRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/mcp': typeof McpRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/devices': typeof AuthenticatedDevicesRoute
@@ -166,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/payments': typeof AuthenticatedPaymentsRoute
   '/redeem': typeof AuthenticatedRedeemRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/cms': typeof AuthenticatedAdminCmsRoute
   '/admin/codes': typeof AuthenticatedAdminCodesRoute
   '/admin/courses': typeof AuthenticatedAdminCoursesRoute
@@ -183,12 +205,15 @@ export interface FileRoutesByTo {
   '/courses': typeof CoursesRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/mcp': typeof McpRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/devices': typeof AuthenticatedDevicesRoute
   '/my-courses': typeof AuthenticatedMyCoursesRoute
   '/payments': typeof AuthenticatedPaymentsRoute
   '/redeem': typeof AuthenticatedRedeemRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/cms': typeof AuthenticatedAdminCmsRoute
   '/admin/codes': typeof AuthenticatedAdminCodesRoute
   '/admin/courses': typeof AuthenticatedAdminCoursesRoute
@@ -208,6 +233,8 @@ export interface FileRoutesById {
   '/courses': typeof CoursesRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/mcp': typeof McpRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/devices': typeof AuthenticatedDevicesRoute
@@ -215,6 +242,7 @@ export interface FileRoutesById {
   '/_authenticated/payments': typeof AuthenticatedPaymentsRoute
   '/_authenticated/redeem': typeof AuthenticatedRedeemRoute
   '/courses_/$slug': typeof CoursesSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/admin/cms': typeof AuthenticatedAdminCmsRoute
   '/_authenticated/admin/codes': typeof AuthenticatedAdminCodesRoute
   '/_authenticated/admin/courses': typeof AuthenticatedAdminCoursesRoute
@@ -234,6 +262,8 @@ export interface FileRouteTypes {
     | '/courses'
     | '/faq'
     | '/how-it-works'
+    | '/mcp'
+    | '/.well-known/oauth-protected-resource'
     | '/admin'
     | '/dashboard'
     | '/devices'
@@ -241,6 +271,7 @@ export interface FileRouteTypes {
     | '/payments'
     | '/redeem'
     | '/courses/$slug'
+    | '/.lovable/oauth/consent'
     | '/admin/cms'
     | '/admin/codes'
     | '/admin/courses'
@@ -258,12 +289,15 @@ export interface FileRouteTypes {
     | '/courses'
     | '/faq'
     | '/how-it-works'
+    | '/mcp'
+    | '/.well-known/oauth-protected-resource'
     | '/dashboard'
     | '/devices'
     | '/my-courses'
     | '/payments'
     | '/redeem'
     | '/courses/$slug'
+    | '/.lovable/oauth/consent'
     | '/admin/cms'
     | '/admin/codes'
     | '/admin/courses'
@@ -282,6 +316,8 @@ export interface FileRouteTypes {
     | '/courses'
     | '/faq'
     | '/how-it-works'
+    | '/mcp'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/devices'
@@ -289,6 +325,7 @@ export interface FileRouteTypes {
     | '/_authenticated/payments'
     | '/_authenticated/redeem'
     | '/courses_/$slug'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/admin/cms'
     | '/_authenticated/admin/codes'
     | '/_authenticated/admin/courses'
@@ -308,7 +345,10 @@ export interface RootRouteChildren {
   CoursesRoute: typeof CoursesRoute
   FaqRoute: typeof FaqRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  McpRoute: typeof McpRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CoursesSlugRoute: typeof CoursesSlugRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicHealthzRoute: typeof ApiPublicHealthzRoute
 }
 
@@ -363,6 +403,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HowItWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -410,6 +464,13 @@ declare module '@tanstack/react-router' {
       path: '/courses/$slug'
       fullPath: '/courses/$slug'
       preLoaderRoute: typeof CoursesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
@@ -532,7 +593,11 @@ const rootRouteChildren: RootRouteChildren = {
   CoursesRoute: CoursesRoute,
   FaqRoute: FaqRoute,
   HowItWorksRoute: HowItWorksRoute,
+  McpRoute: McpRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CoursesSlugRoute: CoursesSlugRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicHealthzRoute: ApiPublicHealthzRoute,
 }
 export const routeTree = rootRouteImport
