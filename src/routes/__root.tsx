@@ -15,6 +15,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
+import { prepareIdentityCache } from "@/lib/auth-cache";
 
 function NotFoundComponent() {
   return (
@@ -77,6 +79,13 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: async ({ context }) => {
+    // Browser-only: establish ownership before any child loader starts fetching.
+    // SSR keeps its request-local client and never reads a browser session.
+    if (typeof window === "undefined") return;
+    const { data, error } = await supabase.auth.getSession();
+    await prepareIdentityCache(context.queryClient, error ? null : data.session?.user.id ?? null);
+  },
   head: () => ({
     // Replace these placeholders with the app's name and description when first building the app.
     // Each content route, / included, must still set its own head(). Never add og:image or

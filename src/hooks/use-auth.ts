@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { isolateIdentityCache } from '@/lib/auth-cache';
+import { prepareIdentityCache } from '@/lib/auth-cache';
 
 const AuthContext = createContext<{ user: User | null; loading: boolean }>({ user: null, loading: true });
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -13,18 +13,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   useEffect(() => {
     let disposed = false;
-    let identity: string | null = null;
     let authEventSeen = false;
     let pending = Promise.resolve();
     function applySession(nextUser: User | null, event: string) {
       pending = pending.then(async () => {
         if (disposed) return;
         const nextIdentity = nextUser?.id ?? null;
-        // Clear even on INITIAL_SESSION after a public/protected tree remount:
-        // a different account must never inherit the previous account's cache.
-        await isolateIdentityCache(queryClient, identity, nextIdentity);
+        // Loaders establish ownership first; remounting for the same account
+        // must not cancel the dashboard requests those loaders just started.
+        await prepareIdentityCache(queryClient, nextIdentity);
         if (disposed) return;
-        identity = nextIdentity;
         setUser(nextUser);
         setLoading(false);
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {

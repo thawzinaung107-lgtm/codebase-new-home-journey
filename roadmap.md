@@ -1,5 +1,9 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Dashboard cancellation regression — 2026-11-14
+- [x] Establish query-cache ownership in the browser root before page loaders and reuse it across auth-provider remounts; retain cancellation/clearing on real identity changes and leave the managed protected gate unchanged.
+- [x] 13 regression tests PASS; signed-in dashboard direct entry, reload, and public-course return repeated three times each at 1280px and 574px, existing enrollment visible, zero page errors; automatic build OK. No record or publication changes.
+
 ## Client test preparation — 2026-11-14
 - [x] Google sign-in investigation: supplied logs show three successful Google logins, no provider rejection; hosted redirect settings include both preview surfaces. Actual session handoff to /auth?next=/devices and existing-session /auth?next=/dashboard both render their destination, desktop/mobile, zero page errors; nine auth tests pass. No auth configuration or application code changed.
 - [x] Owner reports Google sign-in works again at 20:02 UTC. No further login-error action needed; sandbox popup round-trip was not independently verified.
