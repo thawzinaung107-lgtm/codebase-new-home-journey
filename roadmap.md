@@ -114,6 +114,7 @@ Publication/deployment/audience changes and DNS cutover are explicitly OUT OF SC
 
 ## Admin UX upgrade (4 stages)
 - [x] Stage 1 payment review (drawer, expiry presets, reject presets, send message, pending badge)
-- [ ] Stage 2 courses manager — waiting for owner go-ahead
-- [ ] Stage 3 student support
+- [x] Stage 2 courses manager (split view, status chips, drag reorder, floating upload panel)
+- [ ] Stage 3 — waiting for owner go-ahead
+  (Stage 3 student support)
 - [ ] Stage 4 phone admin

@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
-import { ArrowDown, ArrowUp, Pencil, Plus, RotateCcw, Trash2, Upload, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, Pencil, Plus, RotateCcw, Trash2, Upload, X, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Upload as TusUpload } from 'tus-js-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { statusTone, toneClass, reorderSteps } from '@/lib/lesson-status';
 import { createLessonUpload, deleteCourseLesson, moveLesson, refreshLessonVideos, resumeLessonUpload, setLessonPublished, updateLessonDetails } from '@/lib/bunny-lessons.functions';
 import { needsVideoRefresh, sanitizeTitle, TUS_ENDPOINT, uploadFailure, UPLOAD_RETRY_DELAYS, validateVideoFile } from '@/lib/bunny-upload';
 
@@ -30,6 +31,7 @@ export function CourseLessons({ courseId, courseTitle, lessons }: { courseId: st
   const [busy, setBusy] = useState(''); const [editing, setEditing] = useState<Lesson | null>(null); const [deleting, setDeleting] = useState<Lesson | null>(null); const [deleteVideo, setDeleteVideo] = useState(false);
   const [encode, setEncode] = useState<Record<string, number>>({}); const resumeFor = useRef<string | null>(null); const resumeInput = useRef<HTMLInputElement>(null);
   const [pollError, setPollError] = useState('');
+  const [dragFrom, setDragFrom] = useState<number | null>(null); const [dragOver, setDragOver] = useState<number | null>(null);
   const sorted = [...lessons].sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
   const patch = (id: string, t: Partial<Transfer>) => setTransfers(p => ({ ...p, [id]: { ...(p[id] ?? { name: '', progress: 0, state: 'uploading' }), ...t } }));
   const active = Object.values(transfers).some(t => t.state === 'uploading');
@@ -82,6 +84,7 @@ export function CourseLessons({ courseId, courseTitle, lessons }: { courseId: st
     await act(l.id, async () => { const r = await remove({ data: { lessonId: l.id, deleteVideo } }); setTransfers(p => { const n = { ...p }; delete n[l.id]; return n; }); return r; }, 'Lesson deleted'); setDeleting(null); setDeleteVideo(false);
   }
 
+  async function dropAt(to: number) { const from = dragFrom; setDragFrom(null); setDragOver(null); if (from === null) return; const step = reorderSteps(from, to); const l = sorted[from]; if (!step || !l) return; await act(l.id, async () => { for (let k = 0; k < step.count; k++) await move({ data: { lessonId: l.id, direction: step.direction } }); }, 'Order saved'); }
   function status(l: Lesson) {
     const t = transfers[l.id];
     if (t && t.state !== 'done') return t.state === 'error' ? 'Upload interrupted' : t.state === 'paused' ? `Paused · ${t.progress}%` : `Uploading · ${t.progress}%`;
@@ -92,15 +95,15 @@ export function CourseLessons({ courseId, courseTitle, lessons }: { courseId: st
     return t?.state === 'done' ? 'Processing' : 'Waiting for video';
   }
 
-  return <section className="mt-10 border-t pt-8" aria-label="Course lessons">
+  return <section aria-label="Course lessons">
     <div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-xl font-semibold">{courseTitle}</h2><p className="mt-1 text-sm text-muted-foreground">{sorted.length} lesson{sorted.length === 1 ? '' : 's'}</p></div><Button onClick={() => setOpen(true)}><Plus />Add lesson</Button></div>
     {pollError && <p role="alert" className="mt-4 text-sm text-destructive">{pollError}</p>}
     <input ref={resumeInput} type="file" accept="video/*" className="hidden" onChange={e => { void resumeWith(e.target.files?.[0]); e.target.value = ''; }} />
     {sorted.length === 0 ? <div className="mt-6 border border-dashed p-10 text-center"><p className="font-medium">No lessons yet</p><p className="mt-2 text-sm text-muted-foreground">Add your first lesson and upload its video.</p><Button className="mt-5" onClick={() => setOpen(true)}><Upload />Upload video</Button></div> :
-      <ol className="mt-6 divide-y border-y">{sorted.map((l, i) => { const t = transfers[l.id]; const uploading = t && t.state !== 'done'; return <li key={l.id} className="grid gap-3 py-4 md:grid-cols-[2rem_minmax(0,1fr)_12rem_auto] md:items-center">
-        <span className="text-sm text-muted-foreground">{i + 1}</span>
+      <ol className="mt-6 divide-y border-y">{sorted.map((l, i) => { const t = transfers[l.id]; const uploading = t && t.state !== 'done'; return <li key={l.id} draggable={!busy && !uploading} onDragStart={() => setDragFrom(i)} onDragOver={e => { if (dragFrom !== null) { e.preventDefault(); setDragOver(i); } }} onDragEnd={() => { setDragFrom(null); setDragOver(null); }} onDrop={e => { e.preventDefault(); void dropAt(i); }} className={`grid gap-3 py-4 md:grid-cols-[2.5rem_minmax(0,1fr)_12rem_auto] md:items-center ${dragOver === i && dragFrom !== i ? 'bg-surface' : ''} ${dragFrom === i ? 'opacity-50' : ''}`}>
+        <span className="flex items-center gap-1 text-sm text-muted-foreground"><GripVertical aria-hidden className="hidden size-4 cursor-grab md:block" />{i + 1}</span>
         <div className="min-w-0"><p className="font-medium break-words">{l.title}</p>{l.description && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{l.description}</p>}<p className="mt-1 text-xs text-muted-foreground">Length {fmt(l.duration_seconds)}</p></div>
-        <div className="text-sm"><p>{status(l)}</p>{uploading && <div className="mt-2 h-1.5 w-full bg-surface" role="progressbar" aria-valuenow={t.progress} aria-valuemin={0} aria-valuemax={100} aria-label={`Upload progress for ${l.title}`}><div className="h-full bg-foreground transition-all" style={{ width: `${t.progress}%` }} /></div>}{t?.error && <p className="mt-1 text-xs text-destructive">{t.error}</p>}</div>
+        <div className="text-sm"><span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${toneClass[statusTone(status(l))]}`}>{status(l)}</span>{uploading && <div className="mt-2 h-1.5 w-full bg-surface" role="progressbar" aria-valuenow={t.progress} aria-valuemin={0} aria-valuemax={100} aria-label={`Upload progress for ${l.title}`}><div className="h-full bg-foreground transition-all" style={{ width: `${t.progress}%` }} /></div>}{t?.error && <p className="mt-1 text-xs text-destructive">{t.error}</p>}</div>
         <div className="flex flex-wrap gap-2 md:justify-end">
           {t?.state === 'uploading' && <Button size="sm" variant="outline" onClick={() => { void uploads.current.get(l.id)?.abort(); patch(l.id, { state: 'paused' }); }}><X />Cancel</Button>}
           {(t?.state === 'paused' || t?.state === 'error') && uploads.current.get(l.id) && <Button size="sm" variant="outline" onClick={() => { patch(l.id, { state: 'uploading', error: undefined }); uploads.current.get(l.id)?.start(); }}><RotateCcw />{t.state === 'error' ? 'Retry' : 'Resume'}</Button>}
@@ -112,6 +115,7 @@ export function CourseLessons({ courseId, courseTitle, lessons }: { courseId: st
           <Button size="icon" variant="ghost" aria-label={`Delete ${l.title}`} onClick={() => { setDeleteVideo(false); setDeleting(l); }}><Trash2 /></Button>
         </div></li>; })}</ol>}
 
+    {Object.entries(transfers).some(([, t]) => t.state !== 'done') && !open && <div role="status" aria-label="Uploads in progress" className="fixed bottom-4 right-4 z-40 w-72 rounded-md border bg-background p-4 shadow-lg"><p className="mb-2 text-sm font-medium">Uploading videos</p>{Object.entries(transfers).filter(([, t]) => t.state !== 'done').map(([id, t]) => <div key={id} className="mt-2 text-xs"><p className="truncate">{sorted.find(l => l.id === id)?.title ?? 'Lesson'} · {t.state === 'uploading' ? `${t.progress}%` : t.state}</p><div className="mt-1 h-1 bg-surface"><div className="h-full bg-foreground" style={{ width: `${t.progress}%` }} /></div></div>)}<p className="mt-3 text-xs text-muted-foreground">Keep this page open. You can keep editing.</p></div>}
     <Dialog open={open} onOpenChange={v => { if (!submitting) setOpen(v); }}><DialogContent className="max-h-[90vh] overflow-y-auto"><DialogHeader><DialogTitle>Add lesson</DialogTitle><DialogDescription>Choose a video from your computer. It uploads directly and keeps going if your connection drops.</DialogDescription></DialogHeader>
       <form onSubmit={submit} className="space-y-4">
         <label className="block space-y-2 text-sm"><span>Lesson title</span><Input value={form.title} required maxLength={160} onChange={e => setForm({ ...form, title: e.target.value })} /></label>
