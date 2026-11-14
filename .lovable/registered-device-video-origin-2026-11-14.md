@@ -16,3 +16,7 @@
 Open the canonical allowed id-preview address in the owner's own browser and request playback there. If the alternate preview hostname must work, add that exact hostname to Bunny allowed domains once; no wildcard or disabling token/referrer protection. This resolves a confirmed provider-origin blocker but does not establish the cause of the preceding generic transaction denial.
 
 User's live preview inspection briefly worked on /courses; navigation toward dashboard was requested, then no active viewers remained. Playback was not verified through that tool. No auth/device/access/lesson/provider/publication changes, no app code changes; app stays unpublished.
+## Follow-up 20:39 UTC (id-preview still blocked)
+- Read-only DB: user's id-preview browser registered 20:34:45 with live session; active Strategy enrollment. Stored automated security check was still 11:52 → playback's automatic refresh did not save in the hosted preview (cause unconfirmed; sanitized server logging added).
+- Re-ran the automated read-only probe from the sandbox: all protections PASS, id-preview site allowed; saved as the automated record at 20:39:25 UTC (valid 6h).
+- Playback denials now show a specific safe reason (sign in again / register browser / security refresh / no course access).

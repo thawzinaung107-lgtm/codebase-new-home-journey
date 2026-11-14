@@ -106,6 +106,15 @@ export const verifyDraftVideo = createServerFn({ method: 'POST' }).middleware([r
     return { ready: result !== null, passed: result?.passed ?? false, checks: result?.checks ?? null, siteAllowed: result?.siteAllowed ?? null, checkedAt: new Date().toISOString() };
   });
 
+// Safe, student-facing explanation for each database refusal; never exposes identifiers.
+export function playbackDenialReason(message: string, isError: boolean) {
+  if (message.includes('Sign in again')) return 'Sign out and sign in again, then register this browser on Devices.';
+  if (message.includes('Registered active browser required')) return 'Register this browser on the Devices page, then try again.';
+  if (message.includes('security configuration unverified')) return 'The video security check could not refresh. Please try again in a minute.';
+  if (!isError) return 'This lesson is not available for your current course access.';
+  return 'Playback is temporarily unavailable. Please try again.';
+}
+
 export const getLessonPlayback = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
   .inputValidator(z.object({ lessonId: z.string().uuid(), browserToken: z.string().min(32).max(100) }))
   .handler(async ({ data, context }) => {
@@ -119,11 +128,17 @@ export const getLessonPlayback = createServerFn({ method: 'POST' }).middleware([
       try {
         const { probeSecurity, recordProbe } = await import('./bunny-video.server');
         const result = await probeSecurity(null);
+        if (!result) console.error('[playback] security refresh: no ready provider video');
+        else if (!result.passed) console.error('[playback] security refresh: protections failed', JSON.stringify(result.checks));
         if (result) { const { supabaseAdmin } = await import('@/integrations/supabase/client.server'); await recordProbe(supabaseAdmin, result); }
-      } catch { /* fail closed below */ }
+      } catch (e) { console.error('[playback] security refresh failed:', e instanceof Error ? e.message : 'unknown'); }
       r = await context.supabase.rpc('lms_bunny_playback_mapping', { p_lesson: data.lessonId, p_hash: hash });
     }
-    if (r.error || !r.data?.[0]) return { available: false as const, reason: 'Playback blocked: verify course access, browser registration, lesson mapping and Bunny security checks' };
+    if (r.error || !r.data?.[0]) {
+      const msg = r.error?.message ?? '';
+      console.error('[playback] denied:', r.error ? msg.slice(0, 80) : 'no matching lesson/enrollment');
+      return { available: false as const, reason: playbackDenialReason(msg, !!r.error) };
+    }
     try {
       const { bunnyConfig, decryptGuid, libraryRequest, safeVideo, signedEmbed } = await import('./bunny-video.server');
       const config = bunnyConfig(); const mapping = r.data[0];
