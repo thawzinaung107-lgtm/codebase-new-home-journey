@@ -1,6 +1,8 @@
 # AI Marketing Academy — focused launch roadmap
 
 ## Client test preparation — 2026-11-14
+- [x] Next-step preflight: current signed-in student payment/redeem/device screens verified at 1280px and 470px; no overflow or page errors. 42 focused tests passed; 1 mutating redemption test intentionally skipped. Device registration correctly disabled because the injected session lacks a session ID. Orders/enrollments/devices remain zero; five mappings preserved.
+- [ ] Owner input required: choose a dedicated test learner, or explicitly authorize testing on the current signed-in account, before creating a test receipt/access/device record. Device/playback verification additionally requires a real Google sign-in session. No existing users or provider videos changed.
 - [x] Enabled Strategy 75,000 MMK / 30 days and Creation 55,000 MMK / 60 days for authorized test receipt submission. Existing DEMO ONLY placeholder instructions were already published; left unchanged. Unrelated draft course unchanged.
 - [x] Replaced permanently blocked streaming checklist with fresh, admin-only, exact-video read-only checks; test configuration never grants production launch approval.
 - [x] Authenticated desktop/mobile payment form and admin checklist verified: all five published videos passed protection checks, localhost referrer is blocked and reported honestly; no overflow/page errors. Database linter retains 16 review flags (locked tables / guarded transactional functions), not a clean security certification.
