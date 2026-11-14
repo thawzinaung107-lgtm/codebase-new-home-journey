@@ -1,5 +1,9 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Owner-supplied MP4 upload test — 2026-11-14, 11:48 UTC
+- [x] Supplied VN20261114_141049.mp4 (47,664,601 bytes, 41.5 seconds) uploaded through the current authorized admin screen into AI Content Creation as a new draft. Real TUS POST 201 / PATCH 204; Processing 5% → 40% → Ready · draft. Fresh-page readback and 620px display PASS, no page errors/overflow. No app upload failure reproduced or code fix needed.
+- [x] Existing three lesson statuses unchanged; no prior media touched, no deletion/publishing/account/payment actions. Site readback is_published=false. Evidence: `.lovable/owned-mp4-upload-2026-11-14.md`. Student signed playback remains untested.
+
 ## Focused real-world upload check — 2026-11-14
 - [x] Both mapped videos GET status 4/100%; read-only security probe passes, but NOT persisted (legacy manual row unchanged). TUS OPTIONS 204. No actual upload failure observed in logs; records/media preserved.
 - [x] Fix refresh after reopen for unconfigured lessons and ready auto drafts; validate mapping library/save errors; expose descriptive failures and unavailable legacy publication. Remove duplicate manual creation forms, retain course edit and collapsed existing-video tools.
