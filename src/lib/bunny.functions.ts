@@ -101,3 +101,33 @@ export const getLessonPlayback = createServerFn({ method: 'POST' }).middleware([
       return { available: true as const, ...await signedEmbed(config.token, config.library, video.guid) };
     } catch { return { available: false as const, reason: 'Mapped video or Bunny configuration unavailable' }; }
   });
+// Read-only: inspects every mapped lesson against current config/provider; never writes mappings or lessons.
+export const listPlaybackReadiness = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await guard(context.supabase, context.userId);
+    const db = context.supabase;
+    const [maps, lessons, sec] = await Promise.all([
+      db.from('lesson_bunny_videos').select('lesson_id,encrypted_video,library_id,video_fingerprint,updated_at'),
+      db.from('lessons').select('id,title,status,video_status,duration_seconds'),
+      db.from('bunny_security_checks').select('*').order('verified_at', { ascending: false }).limit(1),
+    ]);
+    if (maps.error || lessons.error) throw new Error('Mappings unavailable');
+    const { bunnyConfig, decryptGuid, sha256, libraryRequest, safeVideo } = await import('./bunny-video.server');
+    const { playbackFlags } = await import('./playback-readiness');
+    const config = bunnyConfig();
+    const s = sec.data?.[0];
+    const securityPassed = !!s && s.library_id === config.library && s.unsigned_denied && s.embed_tokens && s.signed_allowed && s.preview_referrer && s.direct_media_denied;
+    const securityFresh = !!s && Date.now() - new Date(s.verified_at).getTime() < 6 * 3600_000;
+    const rows = await Promise.all(maps.data.map(async m => {
+      const lesson = lessons.data.find(l => l.id === m.lesson_id);
+      const libraryMatches = m.library_id === config.library;
+      let guid: string | null = null;
+      try { guid = await decryptGuid(m.encrypted_video, config.token); } catch { guid = null; }
+      const fingerprintMatches = !!guid && (await sha256(m.library_id + ':' + guid)) === m.video_fingerprint;
+      let provider: { ready: boolean; length: number } | null = null;
+      if (guid && libraryMatches) { try { const v = safeVideo(await libraryRequest('/' + guid), config.library); provider = { ready: v.ready, length: v.length }; } catch { provider = null; } }
+      const r = playbackFlags({ lessonStatus: lesson?.status ?? 'missing', videoStatus: lesson?.video_status ?? '', storedDuration: lesson?.duration_seconds ?? 0, libraryMatches, decrypted: !!guid, fingerprintMatches, provider, securityFresh, securityPassed });
+      return { lessonId: m.lesson_id, title: lesson?.title ?? 'Missing lesson', status: lesson?.status ?? 'missing', mappedAt: m.updated_at, ...r };
+    }));
+    return { rows, securityCheckedAt: s?.verified_at ?? null, checkedAt: new Date().toISOString() };
+  });
