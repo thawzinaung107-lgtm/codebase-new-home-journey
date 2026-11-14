@@ -57,9 +57,13 @@ export async function libraryRequest(path: string, init: { method?: 'GET' | 'POS
       headers: { AccessKey: api, Accept: 'application/json', ...(init.body ? { 'Content-Type': 'application/json' } : {}) },
       body: init.body ? JSON.stringify(init.body) : null, redirect: 'error', signal: AbortSignal.timeout(15000),
     });
-    if (!response.ok) throw new Error('Provider unavailable');
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) throw new Error('Bunny refused the video request (permission denied). Nothing was uploaded.');
+      if (response.status === 404) throw new Error('The linked Bunny video or library was not found.');
+      throw new Error(`Bunny video request failed (HTTP ${response.status}). Please retry.`);
+    }
     return await response.json() as unknown;
-  } catch { throw new Error('Bunny video request unavailable'); }
+  } catch (e) { if (e instanceof Error && e.message.startsWith('Bunny') || e instanceof Error && e.message.startsWith('The linked Bunny')) throw e; throw new Error('Bunny could not be reached. Check the connection and retry.'); }
 }
 export async function createVideo(title: string) {
   const { library } = bunnyConfig();

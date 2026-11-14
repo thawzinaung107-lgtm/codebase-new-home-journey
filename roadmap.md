@@ -1,5 +1,11 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Focused real-world upload check — 2026-11-14
+- [x] Both mapped videos GET status 4/100%; read-only security probe passes, but NOT persisted (legacy manual row unchanged). TUS OPTIONS 204. No actual upload failure observed in logs; records/media preserved.
+- [x] Fix refresh after reopen for unconfigured lessons and ready auto drafts; validate mapping library/save errors; expose descriptive failures and unavailable legacy publication. Remove duplicate manual creation forms, retain course edit and collapsed existing-video tools.
+- [x] 103 tests PASS / 1 mutating SKIP; automatic compile OK, basic security clear, 57 dependencies clean; anonymous/private-read and current nonadmin boundaries PASS desktop/mobile with zero page errors. Evidence: `.lovable/upload-check-2026-11-14.md`.
+- [ ] HUMAN REQUIRED: owned-file upload and enrolled registered-session playback; current injected session is nonadmin, so authorized admin UI remains unverified. No impersonation, diagnostic uploads or live mutations authorized. Polling still needs the course editor open.
+
 ## Simple lesson upload — 2026-11-13, 23:24 UTC request
 - [x] Admin → Courses → Lessons → Add lesson: title, optional description, drag/drop or file picker, optional order, auto-publish-when-ready; progress %, Cancel/Retry/Resume (also after reload), Processing→Ready polling, edit/reorder/publish/unpublish/delete with confirmation (Bunny video deleted only on explicit choice; empty unfinished uploads cleaned up). Default "Course Lessons" section created on first lesson. Old tools kept under Advanced.
 - [x] Official Bunny presigned TUS (SHA256(library+apiKey+expire+videoId), 12-hour window, 4 headers, filetype/title metadata) direct from browser; admin-only server create/resign/status/delete; DB guards: publish requires ready mapped video, idempotent upload request, progress-protected delete.

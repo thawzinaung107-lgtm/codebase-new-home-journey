@@ -29,9 +29,9 @@ export const createLessonUpload = createServerFn({ method: 'POST' }).middleware(
     const existing = await db.from('lesson_bunny_videos').select('encrypted_video,upload_expires_at').eq('lesson_id', row.lesson_id).maybeSingle();
     if (existing.data) return credentials(row.lesson_id, await decryptGuid(existing.data.encrypted_video, c.token), Math.floor(Date.parse(existing.data.upload_expires_at ?? '') / 1000) || newExpiry(), data.title, filetype, false);
     let video;
-    try { video = await createVideo(data.title); } catch {
+    try { video = await createVideo(data.title); } catch (e) {
       if (row.created) await db.rpc('lms_admin_delete_lesson', { p_lesson: row.lesson_id });
-      throw new Error('Bunny could not create the video. Nothing was uploaded; please try again.');
+      throw new Error(e instanceof Error ? e.message : 'Bunny could not create the video. Nothing was uploaded; please try again.');
     }
     const expires = newExpiry();
     const saved = await db.from('lesson_bunny_videos').insert({ lesson_id: row.lesson_id, library_id: c.library, encrypted_video: await encryptGuid(video.guid, c.token), video_fingerprint: await sha256(c.library + ':' + video.guid), upload_expires_at: new Date(expires * 1000).toISOString() });
@@ -87,19 +87,28 @@ export const refreshLessonVideos = createServerFn({ method: 'POST' }).middleware
     const db = context.supabase; await requireAdmin(db, context.userId);
     const modules = await db.from('modules').select('id').eq('course_id', data.courseId);
     const ids = (modules.data ?? []).map(m => m.id); if (!ids.length) return [];
-    const lessons = await db.from('lessons').select('id,status,video_status,auto_publish').in('module_id', ids).neq('video_status', 'ready').limit(50);
-    if (lessons.error || !lessons.data.length) return [];
-    const maps = await db.from('lesson_bunny_videos').select('lesson_id,encrypted_video').in('lesson_id', lessons.data.map(l => l.id));
+    const lessons = await db.from('lessons').select('id,status,video_status,auto_publish').in('module_id', ids).or('video_status.neq.ready,and(status.eq.draft,auto_publish.eq.true)').limit(50);
+    if (lessons.error) throw new Error('Lesson video status could not be loaded');
+    if (!lessons.data.length) return [];
+    const maps = await db.from('lesson_bunny_videos').select('lesson_id,encrypted_video,library_id').in('lesson_id', lessons.data.map(l => l.id));
+    if (maps.error) throw new Error('Linked video status could not be loaded');
     const { bunnyConfig, decryptGuid, getVideo } = await server(); const c = bunnyConfig();
-    const out: { id: string; video_status: string; encodeProgress: number; published: boolean }[] = []; let secure: boolean | null = null;
+    const out: { id: string; video_status: string; encodeProgress: number; published: boolean; error?: string }[] = []; let secure: boolean | null = null;
     for (const l of lessons.data) {
-      const m = maps.data?.find(x => x.lesson_id === l.id); if (!m) continue;
-      let v; try { v = await getVideo(await decryptGuid(m.encrypted_video, c.token)); } catch { continue; }
+      const m = maps.data?.find(x => x.lesson_id === l.id);
+      const failed = (error: string) => out.push({ id: l.id, video_status: l.video_status, encodeProgress: 0, published: false, error });
+      if (!m) { failed('A lesson has no linked video. Its published details do not enable playback.'); continue; }
+      if (m.library_id !== c.library) { failed('A linked video belongs to a different Bunny library.'); continue; }
+      let v; try { v = await getVideo(await decryptGuid(m.encrypted_video, c.token)); } catch (e) { failed(e instanceof Error ? e.message : 'Linked video could not be checked'); continue; }
       const state = videoState(v.status); let published = false;
-      if (state !== l.video_status || state === 'ready') await db.from('lessons').update({ video_status: state, ...(v.length ? { duration_seconds: v.length } : {}) }).eq('id', l.id);
+      if (state !== l.video_status) {
+        const saved = await db.from('lessons').update({ video_status: state, ...(v.length ? { duration_seconds: v.length } : {}) }).eq('id', l.id);
+        if (saved.error) { failed('Video status could not be saved. A published lesson needs a ready linked video.'); continue; }
+      }
       if (state === 'ready' && l.auto_publish && l.status === 'draft') {
         secure ??= await ensureSecurity(db, c.library);
         if (secure) published = !(await db.from('lessons').update({ status: 'published' }).eq('id', l.id)).error;
+        if (!secure) { out.push({ id: l.id, video_status: state, encodeProgress: v.encodeProgress, published: false, error: 'Video is ready; automatic publishing is waiting for Bunny protection checks to pass. Checks retry automatically.' }); continue; }
       }
       out.push({ id: l.id, video_status: state, encodeProgress: v.encodeProgress, published });
     }
@@ -137,7 +146,8 @@ export const moveLesson = createServerFn({ method: 'POST' }).middleware([require
     const all = await db.from('lessons').select('id,position').eq('module_id', l.data.module_id).order('position').order('id');
     const list = [...(all.data ?? [])]; const i = list.findIndex(x => x.id === data.lessonId); const j = data.direction === 'up' ? i - 1 : i + 1;
     if (i < 0 || j < 0 || j >= list.length) return { ok: true };
-    [list[i], list[j]] = [list[j]!, list[i]!];
+    const current = list[i]; const adjacent = list[j]; if (!current || !adjacent) return { ok: true };
+    [list[i], list[j]] = [adjacent, current];
     for (const [index, item] of list.entries()) if (item.position !== index) { const r = await db.from('lessons').update({ position: index }).eq('id', item.id); if (r.error) throw new Error('Order could not be saved'); }
     return { ok: true };
   });

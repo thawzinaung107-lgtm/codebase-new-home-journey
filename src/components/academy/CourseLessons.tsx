@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { createLessonUpload, deleteCourseLesson, moveLesson, refreshLessonVideos, resumeLessonUpload, setLessonPublished, updateLessonDetails } from '@/lib/bunny-lessons.functions';
-import { sanitizeTitle, TUS_ENDPOINT, UPLOAD_RETRY_DELAYS, validateVideoFile } from '@/lib/bunny-upload';
+import { needsVideoRefresh, sanitizeTitle, TUS_ENDPOINT, uploadFailure, UPLOAD_RETRY_DELAYS, validateVideoFile } from '@/lib/bunny-upload';
 
 type Lesson = { id: string; module_id: string; title: string; description: string; position: number; status: string; video_status: string; duration_seconds: number; auto_publish: boolean };
 type Creds = Awaited<ReturnType<typeof createLessonUpload>>;
@@ -29,15 +29,16 @@ export function CourseLessons({ courseId, courseTitle, lessons }: { courseId: st
   const uploads = useRef(new Map<string, TusUpload>()); const [transfers, setTransfers] = useState<Record<string, Transfer>>({});
   const [busy, setBusy] = useState(''); const [editing, setEditing] = useState<Lesson | null>(null); const [deleting, setDeleting] = useState<Lesson | null>(null); const [deleteVideo, setDeleteVideo] = useState(false);
   const [encode, setEncode] = useState<Record<string, number>>({}); const resumeFor = useRef<string | null>(null); const resumeInput = useRef<HTMLInputElement>(null);
+  const [pollError, setPollError] = useState('');
   const sorted = [...lessons].sort((a, b) => a.position - b.position || a.id.localeCompare(b.id));
   const patch = (id: string, t: Partial<Transfer>) => setTransfers(p => ({ ...p, [id]: { ...(p[id] ?? { name: '', progress: 0, state: 'uploading' }), ...t } }));
   const active = Object.values(transfers).some(t => t.state === 'uploading');
 
   useEffect(() => { if (!active) return; const warn = (e: BeforeUnloadEvent) => { e.preventDefault(); }; window.addEventListener('beforeunload', warn); return () => window.removeEventListener('beforeunload', warn); }, [active]);
-  const needsPoll = sorted.some(l => l.video_status === 'processing' || (l.video_status === 'unconfigured' && transfers[l.id]?.state === 'done') || (l.video_status === 'ready' && l.status === 'draft' && l.auto_publish));
+  const needsPoll = sorted.some(needsVideoRefresh);
   useEffect(() => {
     if (!needsPoll) return; let stop = false;
-    const tick = async () => { try { const r = await poll({ data: { courseId } }); if (stop) return; setEncode(Object.fromEntries(r.map(x => [x.id, x.encodeProgress]))); if (r.some(x => x.video_status !== lessons.find(l => l.id === x.id)?.video_status || x.published)) await refresh(); } catch { /* retry next tick */ } };
+    const tick = async () => { try { const r = await poll({ data: { courseId } }); if (stop) return; setPollError(r.find(x => x.error)?.error ?? ''); setEncode(Object.fromEntries(r.map(x => [x.id, x.encodeProgress]))); if (r.some(x => x.video_status !== lessons.find(l => l.id === x.id)?.video_status || x.published)) await refresh(); } catch (e) { if (!stop) setPollError(message(e, 'Video status could not be checked. Retrying shortly.')); } };
     void tick(); const timer = setInterval(tick, 15000); return () => { stop = true; clearInterval(timer); };
   }, [needsPoll, courseId, poll, refresh, lessons]);
 
@@ -49,7 +50,7 @@ export function CourseLessons({ courseId, courseTitle, lessons }: { courseId: st
       headers: { AuthorizationSignature: c.signature, AuthorizationExpire: String(c.expirationTime), VideoId: c.videoId, LibraryId: c.libraryId },
       metadata: { filetype: c.filetype, title: c.title },
       onProgress: (sent, total) => patch(c.lessonId, { progress: total ? Math.floor((sent / total) * 100) : 0, state: 'uploading' }),
-      onError: () => patch(c.lessonId, { state: 'error', error: 'Upload interrupted. Check your connection and press Retry — it continues where it stopped.' }),
+      onError: e => patch(c.lessonId, { state: 'error', error: uploadFailure('originalResponse' in e ? e.originalResponse?.getStatus() : undefined) }),
       onSuccess: async () => { localStorage.removeItem(key); uploads.current.delete(c.lessonId); patch(c.lessonId, { progress: 100, state: 'done' }); toast.success('Upload complete. Bunny is processing the video.'); try { await poll({ data: { courseId } }); } catch { /* polling continues */ } await refresh(); },
     });
     uploads.current.set(c.lessonId, upload); localStorage.setItem(key, c.videoId);
@@ -87,11 +88,13 @@ export function CourseLessons({ courseId, courseTitle, lessons }: { courseId: st
     if (l.video_status === 'ready') return l.status === 'published' ? 'Published' : 'Ready · draft';
     if (l.video_status === 'processing') return `Processing${encode[l.id] ? ` · ${encode[l.id]}%` : ''}`;
     if (l.video_status === 'error') return 'Video failed — upload again';
+    if (l.status === 'published') return 'Published details · video unavailable';
     return t?.state === 'done' ? 'Processing' : 'Waiting for video';
   }
 
   return <section className="mt-10 border-t pt-8" aria-label="Course lessons">
     <div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-xl font-semibold">{courseTitle}</h2><p className="mt-1 text-sm text-muted-foreground">{sorted.length} lesson{sorted.length === 1 ? '' : 's'}</p></div><Button onClick={() => setOpen(true)}><Plus />Add lesson</Button></div>
+    {pollError && <p role="alert" className="mt-4 text-sm text-destructive">{pollError}</p>}
     <input ref={resumeInput} type="file" accept="video/*" className="hidden" onChange={e => { void resumeWith(e.target.files?.[0]); e.target.value = ''; }} />
     {sorted.length === 0 ? <div className="mt-6 border border-dashed p-10 text-center"><p className="font-medium">No lessons yet</p><p className="mt-2 text-sm text-muted-foreground">Add your first lesson and upload its video.</p><Button className="mt-5" onClick={() => setOpen(true)}><Upload />Upload video</Button></div> :
       <ol className="mt-6 divide-y border-y">{sorted.map((l, i) => { const t = transfers[l.id]; const uploading = t && t.state !== 'done'; return <li key={l.id} className="grid gap-3 py-4 md:grid-cols-[2rem_minmax(0,1fr)_12rem_auto] md:items-center">
@@ -102,7 +105,7 @@ export function CourseLessons({ courseId, courseTitle, lessons }: { courseId: st
           {t?.state === 'uploading' && <Button size="sm" variant="outline" onClick={() => { void uploads.current.get(l.id)?.abort(); patch(l.id, { state: 'paused' }); }}><X />Cancel</Button>}
           {(t?.state === 'paused' || t?.state === 'error') && uploads.current.get(l.id) && <Button size="sm" variant="outline" onClick={() => { patch(l.id, { state: 'uploading', error: undefined }); uploads.current.get(l.id)?.start(); }}><RotateCcw />{t.state === 'error' ? 'Retry' : 'Resume'}</Button>}
           {!uploading && l.status === 'draft' && (l.video_status === 'unconfigured' || l.video_status === 'error') && t?.state !== 'done' && <Button size="sm" variant="outline" disabled={busy === l.id} onClick={() => { resumeFor.current = l.id; resumeInput.current?.click(); }}><Upload />{l.video_status === 'error' ? 'Upload again' : 'Resume upload'}</Button>}
-          {l.video_status === 'ready' && <Button size="sm" variant={l.status === 'published' ? 'outline' : 'default'} disabled={busy === l.id} onClick={() => act(l.id, () => publish({ data: { lessonId: l.id, published: l.status !== 'published' } }), l.status === 'published' ? 'Lesson unpublished' : 'Lesson published')}>{l.status === 'published' ? 'Unpublish' : 'Publish'}</Button>}
+          {(l.video_status === 'ready' || l.status === 'published') && <Button size="sm" variant={l.status === 'published' ? 'outline' : 'default'} disabled={busy === l.id} onClick={() => act(l.id, () => publish({ data: { lessonId: l.id, published: l.status !== 'published' } }), l.status === 'published' ? 'Lesson unpublished' : 'Lesson published')}>{l.status === 'published' ? 'Unpublish' : 'Publish'}</Button>}
           <Button size="icon" variant="ghost" aria-label={`Move ${l.title} up`} disabled={i === 0 || !!busy} onClick={() => act(l.id, () => move({ data: { lessonId: l.id, direction: 'up' } }), 'Order saved')}><ArrowUp /></Button>
           <Button size="icon" variant="ghost" aria-label={`Move ${l.title} down`} disabled={i === sorted.length - 1 || !!busy} onClick={() => act(l.id, () => move({ data: { lessonId: l.id, direction: 'down' } }), 'Order saved')}><ArrowDown /></Button>
           <Button size="icon" variant="ghost" aria-label={`Edit ${l.title}`} onClick={() => setEditing(l)}><Pencil /></Button>

@@ -43,6 +43,19 @@ export function videoState(status: number): LessonVideoState {
 }
 export const replaceableStatus = (status: number) => status === 0 || status === 6;
 
+export function needsVideoRefresh(l: { video_status: string; status: string; auto_publish: boolean }) {
+  return l.video_status === 'unconfigured' || l.video_status === 'processing' || (l.video_status === 'ready' && l.status === 'draft' && l.auto_publish);
+}
+
+export function uploadFailure(status: number | undefined) {
+  if (status === 401 || status === 403) return 'Bunny refused the upload permission. Select the same file with Resume upload to request fresh permission.';
+  if (status === 404 || status === 410) return 'This upload has expired. Select the same file with Resume upload to restart it.';
+  if (status === 413) return 'Bunny refused this file size. Choose a smaller video.';
+  if (status === 400) return 'Bunny rejected the upload details or its permission expired. Select the same file with Resume upload.';
+  if (status && status >= 500) return 'Bunny is temporarily unavailable. Retry when the service recovers.';
+  return 'Upload interrupted: the connection failed or the browser blocked the request. Retry to continue from the last saved point.';
+}
+
 export type SecurityProbe = { unsigned: number | null; expired: number | null; signed: number | null; foreignReferrer: number | null; directMedia: number | null; site: number | null };
 export function evaluateProbe(p: SecurityProbe) {
   const denied = (s: number | null) => s === 401 || s === 403;
