@@ -1,10 +1,10 @@
 import { createServerFn } from '@tanstack/react-start';
-import { setResponseHeader } from '@tanstack/react-start/server';
+import { getRequestHeader, setResponseHeader } from '@tanstack/react-start/server';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { z } from 'zod';
 
 const guid = z.string().uuid();
-const mappingInput = z.object({ lessonId: z.string().uuid(), videoGuid: guid.nullable(), acknowledged: z.literal(true) });
+const mappingInput = z.object({ lessonId: z.string().uuid(), videoGuid: guid, acknowledged: z.literal(true) });
 const guard = async (db: { rpc: (name: 'has_role', args: { _user_id: string; _role: 'admin' }) => PromiseLike<{ data: unknown; error: unknown }> }, userId: string) => {
   const role = await db.rpc('has_role', { _user_id: userId, _role: 'admin' });
   if (role.error || !role.data) throw new Error('Admin access required');
@@ -28,7 +28,15 @@ export const listBunnyVideos = createServerFn({ method: 'POST' }).middleware([re
     const { libraryRequest, bunnyConfig, safeVideo } = await import('./bunny-video.server');
     const raw = await libraryRequest(`?page=${data.page}&itemsPerPage=25`);
     if (!raw || typeof raw !== 'object' || !('items' in raw) || !Array.isArray(raw.items)) throw new Error('Video list unavailable');
-    return raw.items.slice(0, 25).map(v => safeVideo(v, bunnyConfig().library));
+    const config = bunnyConfig();
+    const mappings = await context.supabase.from('lesson_bunny_videos').select('lesson_id,video_fingerprint,library_id');
+    if (mappings.error) throw new Error('Existing video assignments unavailable');
+    const { sha256 } = await import('./bunny-video.server');
+    return Promise.all(raw.items.slice(0, 25).map(async v => {
+      const video = safeVideo(v, config.library);
+      const fingerprint = await sha256(config.library + ':' + video.guid);
+      return { ...video, lessonId: mappings.data.find(m => m.library_id === config.library && m.video_fingerprint === fingerprint)?.lesson_id ?? null };
+    }));
   });
 
 export const mapBunnyVideo = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth]).inputValidator(mappingInput)
@@ -36,22 +44,31 @@ export const mapBunnyVideo = createServerFn({ method: 'POST' }).middleware([requ
     await guard(context.supabase, context.userId);
     const lesson = await context.supabase.from('lessons').select('id,module_id,status').eq('id', data.lessonId).single();
     if (lesson.error || lesson.data.status !== 'draft') throw new Error('Choose an existing draft lesson');
-    const module = await context.supabase.from('modules').select('course_id').eq('id', lesson.data.module_id).single();
-    if (module.error) throw new Error('Lesson course unavailable');
-    if (!data.videoGuid) {
-      const result = await context.supabase.from('lesson_bunny_videos').delete().eq('lesson_id', data.lessonId);
-      if (result.error) throw new Error('Unmapping failed');
-      await context.supabase.from('lessons').update({ video_status: 'unconfigured' }).eq('id', data.lessonId);
-      return { ok: true };
-    }
     const { libraryRequest, bunnyConfig, safeVideo, encryptGuid, sha256 } = await import('./bunny-video.server');
     const config = bunnyConfig();
     const video = safeVideo(await libraryRequest('/' + data.videoGuid), config.library);
     if (!video.ready) throw new Error('Choose a ready video');
-    const result = await context.supabase.from('lesson_bunny_videos').upsert({ lesson_id: data.lessonId, library_id: config.library, encrypted_video: await encryptGuid(video.guid, config.token), video_fingerprint: await sha256(config.library + ':' + video.guid) });
-    if (result.error) throw new Error('Mapping failed; video may already be assigned');
-    await context.supabase.from('lessons').update({ video_status: 'ready', ...(video.length ? { duration_seconds: video.length } : {}) }).eq('id', data.lessonId);
-    return { ok: true };
+    const result = await context.supabase.rpc('lms_admin_map_draft_video', { p_lesson: data.lessonId, p_library: config.library, p_encrypted: await encryptGuid(video.guid, config.token), p_fingerprint: await sha256(config.library + ':' + video.guid), p_duration: video.length });
+    if (result.error) throw new Error('Mapping refused: existing assignments are protected. Choose an unassigned ready video and an unmapped draft lesson.');
+    return { ok: true, alreadyMapped: result.data === 'already_mapped' };
+  });
+
+export const verifyDraftVideo = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ lessonId: z.string().uuid() }))
+  .handler(async ({ data, context }) => {
+    await guard(context.supabase, context.userId);
+    const lesson = await context.supabase.from('lessons').select('id,title,status').eq('id', data.lessonId).single();
+    if (lesson.error) throw new Error('Choose an existing lesson');
+    const mapping = await context.supabase.from('lesson_bunny_videos').select('encrypted_video,library_id').eq('lesson_id', data.lessonId).single();
+    if (mapping.error) throw new Error('This lesson has no video mapping');
+    const { bunnyConfig, decryptGuid, probeSecurity } = await import('./bunny-video.server');
+    const config = bunnyConfig();
+    if (mapping.data.library_id !== config.library) throw new Error('Mapped video library does not match the configured library');
+    const video = await decryptGuid(mapping.data.encrypted_video, config.token);
+    const result = await probeSecurity(getRequestHeader('origin') ?? null, video);
+    const fresh = await context.supabase.from('lesson_bunny_videos').select('encrypted_video,library_id').eq('lesson_id', data.lessonId).single();
+    if (fresh.error || fresh.data.encrypted_video !== mapping.data.encrypted_video || fresh.data.library_id !== config.library) throw new Error('Assignment changed; run verification again');
+    return { ready: result !== null, passed: result?.passed ?? false, checks: result?.checks ?? null, siteAllowed: result?.siteAllowed ?? null, checkedAt: new Date().toISOString() };
   });
 
 export const getLessonPlayback = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])

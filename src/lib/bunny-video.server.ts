@@ -84,12 +84,17 @@ async function status(url: string, referer?: string) {
   } catch { return null; }
 }
 // Behavioural, read-only provider checks: library settings are not readable with the Stream library key.
-export async function probeSecurity(appOrigin?: string | null) {
+export async function probeSecurity(appOrigin?: string | null, videoGuid?: string) {
   const { library, token } = bunnyConfig();
-  const list = await libraryRequest('?page=1&itemsPerPage=25');
-  const items = list && typeof list === 'object' && 'items' in list && Array.isArray(list.items) ? list.items : [];
-  const ready = items.map(v => { try { return safeVideo(v, library); } catch { return null; } }).find(v => v?.ready);
-  if (!ready) return null;
+  let ready: LibraryVideo | null | undefined;
+  if (videoGuid) {
+    ready = await getVideo(videoGuid);
+  } else {
+    const list = await libraryRequest('?page=1&itemsPerPage=25');
+    const items = list && typeof list === 'object' && 'items' in list && Array.isArray(list.items) ? list.items : [];
+    ready = items.map(v => { try { return safeVideo(v, library); } catch { return null; } }).find(v => v?.ready);
+  }
+  if (!ready?.ready) return null;
   const base = `${PLAYER_HOST}/embed/${library}/${ready.guid}`;
   const now = Date.now();
   const signed = await signedEmbed(token, library, ready.guid, now, 120);

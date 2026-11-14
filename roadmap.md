@@ -1,5 +1,9 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Draft video mapping and verification — 2026-11-14
+- [x] Add admin insert-only/idempotent draft mapping RPC and visible lesson workflow; existing mappings cannot be replaced or removed through it. New linking tested with isolated fixtures only: all real lessons now published, so no draft created/unpublished for testing.
+- [x] Owned VN20261114_141049 is already mapped and now published (found before browser actions). Exact-video read-only verification PASS: unsigned/expired denied, signed accepted, foreign website denied, direct HLS denied; localhost referrer denied separately. Existing five encrypted mappings unchanged, no provider mutations; site remains unpublished. Desktop/390px no overflow/page errors; 55 focused tests PASS, build OK. Student paid playback not tested.
+
 ## Owner-supplied MP4 upload test — 2026-11-14, 11:48 UTC
 - [x] Supplied VN20261114_141049.mp4 (47,664,601 bytes, 41.5 seconds) uploaded through the current authorized admin screen into AI Content Creation as a new draft. Real TUS POST 201 / PATCH 204; Processing 5% → 40% → Ready · draft. Fresh-page readback and 620px display PASS, no page errors/overflow. No app upload failure reproduced or code fix needed.
 - [x] Existing three lesson statuses unchanged; no prior media touched, no deletion/publishing/account/payment actions. Site readback is_published=false. Evidence: `.lovable/owned-mp4-upload-2026-11-14.md`. Student signed playback remains untested.

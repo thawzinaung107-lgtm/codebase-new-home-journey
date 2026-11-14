@@ -678,6 +678,16 @@ export type Database = {
         Args: { p_lesson: string }
         Returns: undefined
       }
+      lms_admin_map_draft_video: {
+        Args: {
+          p_duration: number
+          p_encrypted: string
+          p_fingerprint: string
+          p_lesson: string
+          p_library: string
+        }
+        Returns: string
+      }
       lms_bunny_playback_mapping: {
         Args: { p_hash: string; p_lesson: string }
         Returns: {

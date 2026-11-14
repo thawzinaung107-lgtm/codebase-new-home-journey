@@ -78,6 +78,13 @@
       "when": 1794612466852,
       "tag": "0010_simple_lesson_video_upload",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794657685585,
+      "tag": "0011_add_preserving_draft_video_mapping",
+      "breakpoints": true
     }
   ]
 }
