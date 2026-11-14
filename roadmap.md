@@ -111,3 +111,9 @@ Changed files: `src/components/academy/StudentPages.tsx`, `src/components/academ
 - [ ] HUMAN REQUIRED after provider: Myanmar no-VPN desktop/mobile playback, backup/isolated restore and owner acceptance.
 
 Publication/deployment/audience changes and DNS cutover are explicitly OUT OF SCOPE. Owner reports unpublishing; current settings confirm is_published=false (saved audience remains public, not an active publication). Keep current Lovable Cloud and existing database; no external migration. Preserve all existing accounts and records.
+
+## Admin UX upgrade (4 stages)
+- [x] Stage 1 payment review (drawer, expiry presets, reject presets, send message, pending badge)
+- [ ] Stage 2 courses manager — waiting for owner go-ahead
+- [ ] Stage 3 student support
+- [ ] Stage 4 phone admin
