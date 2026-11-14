@@ -13,4 +13,10 @@ describe('authorized demo payment configuration', () => {
   it('does not let a draft instruction open collection even for an approved course', () => {
     expect(paymentReadiness({ status: 'published', price_mmk: 75000, access_days: 30, price_approved: true }, settings).ready).toBe(false);
   });
+  it('accepts the authorized Strategy test configuration at 75000 MMK for 30 days', () => {
+    expect(paymentReadiness({ status: 'published', price_mmk: 75000, access_days: 30, price_approved: true }, [{ ...settings[0], key: 'payment_instructions', value: DEMO_PAYMENT_INSTRUCTIONS, published: true }]).ready).toBe(true);
+  });
+  it('accepts the authorized Creation test configuration at 55000 MMK for 60 days', () => {
+    expect(paymentReadiness({ status: 'published', price_mmk: 55000, access_days: 60, price_approved: true }, [{ ...settings[0], key: 'payment_instructions', value: DEMO_PAYMENT_INSTRUCTIONS, published: true }]).ready).toBe(true);
+  });
 });

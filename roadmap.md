@@ -1,5 +1,11 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Client test preparation — 2026-11-14
+- [x] Enabled Strategy 75,000 MMK / 30 days and Creation 55,000 MMK / 60 days for authorized test receipt submission. Existing DEMO ONLY placeholder instructions were already published; left unchanged. Unrelated draft course unchanged.
+- [x] Replaced permanently blocked streaming checklist with fresh, admin-only, exact-video read-only checks; test configuration never grants production launch approval.
+- [x] Authenticated desktop/mobile payment form and admin checklist verified: all five published videos passed protection checks, localhost referrer is blocked and reported honestly; no overflow/page errors. Database linter retains 16 review flags (locked tables / guarded transactional functions), not a clean security certification.
+- [ ] Next stage: test receipt → review → code → redemption → enrolled playback and device limits with controlled test identities/sessions; no receipt, enrollment or device rows created in this preparation step. Myanmar network and backup recovery remain handover checks. No publishing/provider mutations.
+
 ## Draft video mapping and verification — 2026-11-14
 - [x] Add admin insert-only/idempotent draft mapping RPC and visible lesson workflow; existing mappings cannot be replaced or removed through it. New linking tested with isolated fixtures only: all real lessons now published, so no draft created/unpublished for testing.
 - [x] Owned VN20261114_141049 is already mapped and now published (found before browser actions). Exact-video read-only verification PASS: unsigned/expired denied, signed accepted, foreign website denied, direct HLS denied; localhost referrer denied separately. Existing five encrypted mappings unchanged, no provider mutations; site remains unpublished. Desktop/390px no overflow/page errors; 55 focused tests PASS, build OK. Student paid playback not tested.

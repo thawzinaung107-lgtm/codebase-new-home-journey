@@ -1,2 +1,6 @@
 // Static mock copy only; never read unpublished receiving details into student queries.
 export const DEMO_PAYMENT_INSTRUCTIONS = 'DEMO ONLY — DO NOT SEND MONEY. KPay: 09XXXXXXXXX (placeholder). Wave Pay: 09XXXXXXXXX (placeholder). AYA Pay: 09XXXXXXXXX (placeholder). Recipient: TEST ACCOUNT — NOT REAL. Reference: LMS-DEMO-ONLY.';
+
+export function isDemoPayment(value: string) {
+  return /DEMO ONLY|DO NOT SEND MONEY|placeholder|TEST ACCOUNT/i.test(value);
+}

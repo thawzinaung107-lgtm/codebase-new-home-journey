@@ -21,6 +21,41 @@ export const getBunnyHealth = createServerFn({ method: 'POST' })
     return inspectBunnyHealth(process.env);
   });
 
+// Read-only readiness: verify every published lesson's actual encrypted mapping, never a random library video.
+export const getStreamingReadiness = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await guard(context.supabase, context.userId);
+    const db = context.supabase;
+    const [courses, modules, lessons, mappings] = await Promise.all([
+      db.from('courses').select('id').eq('status', 'published'),
+      db.from('modules').select('id,course_id'),
+      db.from('lessons').select('id,module_id,video_status').eq('status', 'published'),
+      db.from('lesson_bunny_videos').select('lesson_id,encrypted_video,library_id'),
+    ]);
+    if ([courses, modules, lessons, mappings].some(r => r.error)) throw new Error('Video readiness unavailable');
+    const published = courses.data ?? [];
+    const rows = (lessons.data ?? []).filter(l => (modules.data ?? []).some(m => m.id === l.module_id && published.some(c => c.id === m.course_id)));
+    const origin = getRequestHeader('origin') ?? null;
+    const empty = { passed: false, siteAllowed: false, lessonCount: rows.length, checkedAt: new Date().toISOString() };
+    if (!published.length || !rows.length || rows.length > 50 || published.some(c => !rows.some(l => (modules.data ?? []).some(m => m.id === l.module_id && m.course_id === c.id)))) return empty;
+    try {
+      const { bunnyConfig, decryptGuid, probeSecurity } = await import('./bunny-video.server');
+      const config = bunnyConfig();
+      const results = await Promise.all(rows.map(async lesson => {
+        const mapping = mappings.data?.find(m => m.lesson_id === lesson.id);
+        if (lesson.video_status !== 'ready' || !mapping || mapping.library_id !== config.library) return null;
+        return probeSecurity(origin, await decryptGuid(mapping.encrypted_video, config.token));
+      }));
+      const fresh = await db.from('lesson_bunny_videos').select('lesson_id,encrypted_video,library_id');
+      const unchanged = !fresh.error && rows.every(l => {
+        const before = mappings.data?.find(m => m.lesson_id === l.id);
+        const after = fresh.data?.find(m => m.lesson_id === l.id);
+        return before && after && before.encrypted_video === after.encrypted_video && before.library_id === after.library_id;
+      });
+      return { ...empty, passed: !!unchanged && results.every(r => r?.passed === true), siteAllowed: results.every(r => r?.siteAllowed === true), checkedAt: new Date().toISOString() };
+    } catch { return empty; }
+  });
+
 export const listBunnyVideos = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth])
   .inputValidator(z.object({ page: z.number().int().min(1).max(100).default(1) }))
   .handler(async ({ data, context }) => {
