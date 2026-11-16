@@ -1,5 +1,10 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Redeem success reported as failure — 2026-11-16
+- [x] Recover a repeated code submission only when the exact code was redeemed by its assigned caller and its original enrollment remains active; do not change codes, attempts, or access. Affected account readback confirms Strategy redeemed 2026-11-16 04:47 UTC and access through 2026-12-16; duplicate/request-loss mechanism is not independently established.
+- [x] Prevent overlapping form submissions and show confirmed access with a My courses link; 20 focused tests pass, 1 live-mutating test skipped. Authenticated read-only My courses/redeem desktop/mobile checks show existing active access, no overflow/page errors; affected-account redeem replay not performed without its readable code/session.
+- [ ] Live update and the affected account's confirmation remain owner-controlled; no publication or account mutation in this investigation.
+
 ## Dashboard cancellation regression — 2026-11-14
 - [x] Establish query-cache ownership in the browser root before page loaders and reuse it across auth-provider remounts; retain cancellation/clearing on real identity changes and leave the managed protected gate unchanged.
 - [x] 13 regression tests PASS; signed-in dashboard direct entry, reload, and public-course return repeated three times each at 1280px and 574px, existing enrollment visible, zero page errors; automatic build OK. No record or publication changes.

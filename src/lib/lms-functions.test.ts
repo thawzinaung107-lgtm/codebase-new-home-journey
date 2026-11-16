@@ -10,7 +10,7 @@ vi.mock('@tanstack/react-start', () => ({
 vi.mock('@/integrations/supabase/auth-middleware', () => ({ requireSupabaseAuth: {} }));
 const privileged = vi.hoisted(() => ({ from: vi.fn() }));
 vi.mock('@/integrations/supabase/client.server', () => ({ supabaseAdmin: privileged }));
-import { getAdmin, getStudent, registerDevice, getLearning } from './lms.functions';
+import { getAdmin, getStudent, registerDevice, getLearning, redeemCode } from './lms.functions';
 
 // The RPC wrappers are replaced by handlers above; types describe production calls.
 const handler = (fn: unknown) => fn as (args: { data?: unknown; context: unknown }) => Promise<any>;
@@ -57,5 +57,34 @@ describe('protected handler contracts with mock clients', () => {
     const db = readClient({});
     await expect(handler(getLearning)({ data: { courseId: 'course', token: 'a'.repeat(36) }, context: { supabase: db, userId: 'owner', claims: { session_id: 'session' } } })).rejects.toThrow('Register this device');
     expect(db.rpc).not.toHaveBeenCalled();
+  });
+  it('returns first redemption success without privileged recovery reads', async () => {
+    const db=readClient({});db.rpc.mockResolvedValue({data:'enrollment',error:null});
+    expect(await handler(redeemCode)({data:{code:'AMA-TEST-CODE-123456'},context:{supabase:db,userId:'owner'}})).toEqual({id:'enrollment',alreadyRedeemed:false});
+    expect(privileged.from).not.toHaveBeenCalled();
+  });
+  it('recovers only the callers exact used code and original active enrollment without additional writes', async () => {
+    const codes=readClient({redeem_codes:[{id:'used-code',course_id:'strategy',redeemed_at:'2026-11-16',revoked_at:null}]});privileged.from.mockImplementation(codes.from);
+    const db=readClient({enrollments:[{id:'enrollment',expires_at:'2099-12-16',revoked_at:null}]});db.rpc.mockResolvedValue({data:null,error:null});
+    expect(await handler(redeemCode)({data:{code:'AMA-TEST-CODE-123456'},context:{supabase:db,userId:'owner'}})).toEqual({id:'enrollment',alreadyRedeemed:true});
+    const codeChain=codes.from.mock.results[0]?.value;
+    expect(codeChain.eq).toHaveBeenCalledWith('code_hash',expect.stringMatching(/^[a-f0-9]{64}$/));
+    expect(codeChain.eq).toHaveBeenCalledWith('assigned_to','owner');expect(codeChain.eq).toHaveBeenCalledWith('redeemed_by','owner');
+    const accessChain=db.from.mock.results[0]?.value;
+    expect(accessChain.eq).toHaveBeenCalledWith('user_id','owner');expect(accessChain.eq).toHaveBeenCalledWith('course_id','strategy');expect(accessChain.eq).toHaveBeenCalledWith('source_code','used-code');
+    expect(db.rpc).toHaveBeenCalledTimes(1);
+  });
+  it.each([
+    ['unknown or other-user code',null,{id:'enrollment',expires_at:'2099-12-16',revoked_at:null}],
+    ['unused code',{id:'code',course_id:'strategy',redeemed_at:null,revoked_at:null},null],
+    ['revoked code',{id:'code',course_id:'strategy',redeemed_at:'2026-11-16',revoked_at:'2026-11-16'},null],
+    ['missing original enrollment',{id:'code',course_id:'strategy',redeemed_at:'2026-11-16',revoked_at:null},null],
+    ['expired access',{id:'code',course_id:'strategy',redeemed_at:'2026-11-16',revoked_at:null},{id:'enrollment',expires_at:'2000-12-16',revoked_at:null}],
+    ['revoked access',{id:'code',course_id:'strategy',redeemed_at:'2026-11-16',revoked_at:null},{id:'enrollment',expires_at:'2099-12-16',revoked_at:'2026-11-16'}],
+  ])('does not recover %s',async(_label,code,access)=>{
+    privileged.from.mockImplementation(readClient({redeem_codes:code?[code]:[]}).from);
+    const db=readClient({enrollments:access?[access]:[]});db.rpc.mockResolvedValue({data:null,error:null});
+    await expect(handler(redeemCode)({data:{code:'AMA-TEST-CODE-123456'},context:{supabase:db,userId:'owner'}})).rejects.toThrow('Code unavailable');
+    expect(db.rpc).toHaveBeenCalledTimes(1);
   });
 });

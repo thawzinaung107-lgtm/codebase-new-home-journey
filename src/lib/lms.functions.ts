@@ -32,7 +32,18 @@ export const revokeDevice=createServerFn({method:'POST'}).middleware([requireSup
   const r=await context.supabase.rpc('lms_revoke_device',{p_id:data.id}); if(r.error)throw new Error(r.error.message); return {ok:true};
 });
 export const redeemCode=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(z.object({code:codeSchema})).handler(async({data,context})=>{
-  const r=await context.supabase.rpc('lms_redeem',{p_hash:await hashValue(data.code)}); if(r.error)throw new Error(r.error.message); if(!r.data)throw new Error('Code unavailable or attempt limit reached. Check your code or try again in 15 minutes.'); return {id:r.data};
+   const hash=await hashValue(data.code);
+   const r=await context.supabase.rpc('lms_redeem',{p_hash:hash}); if(r.error)throw new Error(r.error.message);
+   if(r.data)return {id:r.data,alreadyRedeemed:false};
+   // Read-only recovery of a committed success. Never grant/extend access or
+   // treat an unrelated enrollment as proof that this exact code succeeded.
+   const {supabaseAdmin}=await import('@/integrations/supabase/client.server');
+   const code=await supabaseAdmin.from('redeem_codes').select('id,course_id,redeemed_at,revoked_at').eq('code_hash',hash).eq('assigned_to',context.userId).eq('redeemed_by',context.userId).maybeSingle();
+   if(!code.error&&code.data?.redeemed_at&&!code.data.revoked_at){
+     const access=await context.supabase.from('enrollments').select('id,expires_at,revoked_at').eq('user_id',context.userId).eq('course_id',code.data.course_id).eq('source_code',code.data.id).maybeSingle();
+     if(!access.error&&access.data&&hasActiveAccess(access.data))return {id:access.data.id,alreadyRedeemed:true};
+   }
+   throw new Error('Code unavailable or attempt limit reached. Check your code or try again in 15 minutes.');
 });
 export const submitOrder=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(z.object({courseId:z.string().uuid(),receipt:z.string().max(500),reference:z.string().trim().max(200)})).handler(async({data,context})=>{
   if(!data.receipt.startsWith(context.userId+'/'))throw new Error('Invalid receipt');
