@@ -22,7 +22,7 @@ export async function inspectBunnyHealth(env: Record<string, string | undefined>
   if (!result.libraryIdValid || !api || /[\r\n]/.test(api)) return result;
   try {
     const response = await request(`https://video.bunnycdn.com/library/${library}/videos?page=1&itemsPerPage=1`, {
-      method: 'GET', headers: { AccessKey: api }, redirect: 'error', signal: AbortSignal.timeout(15000),
+      method: 'GET', headers: { AccessKey: api }, redirect: 'manual', signal: AbortSignal.timeout(15000),
     });
     result.httpStatus = response.status;
     result.apiAccessible = response.status === 200;

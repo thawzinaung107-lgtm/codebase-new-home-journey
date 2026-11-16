@@ -55,7 +55,7 @@ export async function libraryRequest(path: string, init: { method?: 'GET' | 'POS
     const response = await fetch(`https://video.bunnycdn.com/library/${library}/videos${path}`, {
       method: init.method ?? 'GET',
       headers: { AccessKey: api, Accept: 'application/json', ...(init.body ? { 'Content-Type': 'application/json' } : {}) },
-      body: init.body ? JSON.stringify(init.body) : null, redirect: 'error', signal: AbortSignal.timeout(15000),
+      body: init.body ? JSON.stringify(init.body) : null, redirect: 'manual', signal: AbortSignal.timeout(15000),
     });
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) throw new Error('Bunny refused the video request (permission denied). Nothing was uploaded.');
@@ -63,7 +63,11 @@ export async function libraryRequest(path: string, init: { method?: 'GET' | 'POS
       throw new Error(`Bunny video request failed (HTTP ${response.status}). Please retry.`);
     }
     return await response.json() as unknown;
-  } catch (e) { if (e instanceof Error && e.message.startsWith('Bunny') || e instanceof Error && e.message.startsWith('The linked Bunny')) throw e; throw new Error('Bunny could not be reached. Check the connection and retry.'); }
+  } catch (e) {
+    if (e instanceof Error && (e.message.startsWith('Bunny') || e.message.startsWith('The linked Bunny'))) throw e;
+    console.error('[bunny] request failed:', e instanceof Error ? e.name : 'unknown');
+    throw new Error('Bunny could not be reached. Check the connection and retry.');
+  }
 }
 export async function createVideo(title: string) {
   const { library } = bunnyConfig();
