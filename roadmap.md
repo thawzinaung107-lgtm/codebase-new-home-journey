@@ -1,5 +1,9 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Student receipt preview — 2026-11-18
+- [x] Replace History receipt links with square previews and an in-app viewer, image zoom, PDF fallback and retry; preserve private receipt access and all payment records.
+- [x] Existing signed-in receipt renders at 1280px and 390px; zoom and close work, no overflow/page errors. Two student regression tests pass; automatic build OK. No publication or record mutations.
+
 ## Redeem success reported as failure — 2026-11-16
 - [x] Recover a repeated code submission only when the exact code was redeemed by its assigned caller and its original enrollment remains active; do not change codes, attempts, or access. Affected account readback confirms Strategy redeemed 2026-11-16 04:47 UTC and access through 2026-12-16; duplicate/request-loss mechanism is not independently established.
 - [x] Prevent overlapping form submissions and show confirmed access with a My courses link; 20 focused tests pass, 1 live-mutating test skipped. Authenticated read-only My courses/redeem desktop/mobile checks show existing active access, no overflow/page errors; affected-account redeem replay not performed without its readable code/session.
