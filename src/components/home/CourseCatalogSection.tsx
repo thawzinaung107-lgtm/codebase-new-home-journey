@@ -25,7 +25,7 @@ export function CourseCatalogSection({ query, selectedFilter, onReset }: { query
       {visible.map((c) => (
         <Card key={c.number} className="w-full overflow-hidden rounded-2xl border border-border bg-background shadow-none">
           <CardContent className="flex flex-col items-start gap-4 p-[22px]">
-            <div role="img" aria-label={`${c.title} course`} className="aspect-[623/222] w-full rounded-xl bg-cover bg-center" style={{ backgroundImage: `url("${c.image}")` }} />
+            <img src={c.image} alt={`${c.title} course`} loading="lazy" decoding="async" width={623} height={222} className="aspect-[623/222] w-full rounded-xl object-cover object-center" />
             <header className="flex w-full flex-col items-start gap-[15px] rounded-[13px] bg-surface p-[22px]">
               <p className="text-[13px] leading-[19.5px] text-muted-foreground">{c.number}</p>
               <h2 className={`font-semibold text-ink ${c.titleClassName}`}>{c.title}</h2>

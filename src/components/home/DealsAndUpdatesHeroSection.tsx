@@ -18,7 +18,7 @@ const slides = [
 const chip =
   "h-auto rounded-[10px] border-hero-chip-border bg-hero-chip p-3 text-sm font-normal leading-[21px] text-hero-foreground hover:bg-hero-chip-hover hover:text-hero-foreground";
 const arrow =
-  "h-[42px] w-11 rounded-[21px] border border-border bg-background p-0 text-[21px] font-semibold leading-[28.4px] text-hero hover:bg-background/90";
+  "size-11 shrink-0 rounded-[21px] border border-border bg-background p-0 text-[21px] font-semibold leading-[28.4px] text-hero hover:bg-background/90";
 
 export function DealsAndUpdatesHeroSection() {
   const [active, setActive] = useState(0);
@@ -64,16 +64,19 @@ export function DealsAndUpdatesHeroSection() {
               </Button>
             </div>
           </section>
-          <div
-            role="img"
-            aria-label="People discussing a course opportunity"
-            className="h-[300px] min-w-0 rounded-xl bg-cover bg-center"
-            style={{ backgroundImage: `url("${configured?.image || slide?.image || heroImg.url}")` }}
+          <img
+            alt="People discussing a course opportunity"
+            src={configured?.image || slide?.image || heroImg.url}
+            loading="eager"
+            fetchPriority="high"
+            width={583}
+            height={300}
+            className="h-[300px] w-full min-w-0 rounded-xl object-cover object-center"
           />
         </div>
-        <nav aria-label="Deals and updates slides" className="flex w-full items-center justify-between">
-          <span className="text-sm leading-[21px] text-hero-muted">0{active + 1} / 03</span>
-          <div className="inline-flex items-center gap-[7px]">
+        <nav aria-label="Deals and updates slides" className="flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1">
+          <span className="shrink-0 whitespace-nowrap text-sm leading-[21px] text-hero-muted">0{active + 1} / 03</span>
+          <div className="inline-flex shrink-0 items-center">
             {slides.map((s, index) => (
               <Button
                 key={s.title}
@@ -81,11 +84,12 @@ export function DealsAndUpdatesHeroSection() {
                 aria-label={`Go to slide ${index + 1}`}
                 aria-current={active === index ? "true" : undefined}
                 onClick={() => setActive(index)}
-                className={`h-2.5 min-w-0 rounded-md p-0 transition-[width,background-color] ${active === index ? "w-6 bg-hero-foreground" : "w-2.5 bg-hero-dot"}`}
-              />
+                variant="ghost"
+                className="size-11 min-w-0 shrink-0 rounded-md bg-transparent p-0 hover:bg-transparent"
+              ><span aria-hidden="true" className={`h-2.5 rounded-md transition-[width,background-color] motion-reduce:transition-none ${active === index ? "w-6 bg-hero-foreground" : "w-2.5 bg-hero-dot"}`} /></Button>
             ))}
           </div>
-          <div className="inline-flex items-start gap-2">
+          <div className="ml-auto inline-flex shrink-0 items-start gap-2">
             <Button type="button" aria-label="Previous slide" onClick={() => setActive((a) => (a === 0 ? slides.length - 1 : a - 1))} className={arrow}>
               <ChevronLeft />
             </Button>

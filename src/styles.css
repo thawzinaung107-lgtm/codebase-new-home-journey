@@ -9,6 +9,15 @@
 @source "../src";
 @import "tw-animate-css";
 
+/* Same Inter variable font previously delivered by Google Fonts. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/__l5e/assets-v1/f7f3a76d-5a16-4113-97df-92a73da45844/inter-latin.woff2") format("woff2");
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /*

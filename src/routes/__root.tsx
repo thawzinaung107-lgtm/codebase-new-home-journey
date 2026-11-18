@@ -17,6 +17,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { prepareIdentityCache } from "@/lib/auth-cache";
+import interFont from "@/assets/inter-latin.woff2.asset.json";
 
 function NotFoundComponent() {
   return (
@@ -105,9 +106,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" },
+      { rel: "preload", as: "font", type: "font/woff2", href: interFont.url, crossOrigin: "anonymous" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
     ],
   }),

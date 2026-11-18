@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "@tanstack/react-router";
@@ -19,6 +18,7 @@ export function AccountButton() {
         if (error) throw new Error("Sign-out failed. Please try again.");
         toast("Signed out", { description: "Your session has been ended." });
       } else {
+        const { lovable } = await import("@/integrations/lovable/index");
         const result = await lovable.auth.signInWithOAuth("google", {
           redirect_uri: window.location.origin,
         });

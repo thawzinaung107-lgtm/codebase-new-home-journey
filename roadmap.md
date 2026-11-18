@@ -2,9 +2,10 @@
 
 ## Mobile homepage performance — 2026-11-18
 - [x] Diagnose published delivery, throttled mobile loads, font/image chains and touch targets; current browser chunks all HTTP 200, original timeouts not reproduced.
-- [ ] Apply targeted font/image/optional-SDK/touch-target fixes after diagnostic plan review.
-- [ ] Validate tests, automatic build, full mobile/desktop rendering and comparable multiple-run measurements.
-- [ ] Original Lighthouse timing reconciliation awaits its HTML/JSON report; published after-results require separately authorized live update.
+- [x] Apply same-font first-party Inter, native prioritized hero/lazy catalog images, deferred optional sign-in integration and 44px carousel targets; narrow controls wrap without clipping.
+- [x] 143 tests PASS / 1 mutating SKIP; automatic build OK; 320/390/620/1280px full rendering, search, carousel and current-account navigation checked. Three genuine Lighthouse live baseline and three development-preview runs recorded separately; no failed network requests. Evidence: `.lovable/mobile-performance-audit-2026-11-19.md`.
+- [x] Supplied export identified as a failed NO_FCP audit of pagespeed.web.dev, not the Academy; findings documented without using invalid scores.
+- [ ] Exact original timeout/timing reconciliation awaits the successful Academy report/trace; production after-metrics and updated production chunk analysis await separately authorized live update.
 
 ## Student receipt preview — 2026-11-18
 - [x] Replace History receipt links with square previews and an in-app viewer, image zoom, PDF fallback and retry; preserve private receipt access and all payment records.
