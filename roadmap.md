@@ -1,5 +1,11 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Mobile homepage performance — 2026-11-18
+- [x] Diagnose published delivery, throttled mobile loads, font/image chains and touch targets; current browser chunks all HTTP 200, original timeouts not reproduced.
+- [ ] Apply targeted font/image/optional-SDK/touch-target fixes after diagnostic plan review.
+- [ ] Validate tests, automatic build, full mobile/desktop rendering and comparable multiple-run measurements.
+- [ ] Original Lighthouse timing reconciliation awaits its HTML/JSON report; published after-results require separately authorized live update.
+
 ## Student receipt preview — 2026-11-18
 - [x] Replace History receipt links with square previews and an in-app viewer, image zoom, PDF fallback and retry; preserve private receipt access and all payment records.
 - [x] Existing signed-in receipt renders at 1280px and 390px; zoom and close work, no overflow/page errors. Two student regression tests pass; automatic build OK. No publication or record mutations.
