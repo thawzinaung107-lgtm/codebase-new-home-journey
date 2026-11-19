@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
 export const MAX_DEVICES = 2;
-export const SLIDE_INTERVAL_MS = 6000;
-export const SLIDE_COUNT = 3;
+export { SLIDE_INTERVAL_MS, SLIDE_COUNT } from './carousel-rules';
 export const courseSchema = z.object({
   id: z.string().uuid().optional(), slug: z.string().trim().regex(/^[a-z0-9-]+$/).max(120),
   title: z.string().trim().min(1).max(160), description: z.string().max(5000),

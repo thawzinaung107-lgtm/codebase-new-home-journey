@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { academyQuery } from "@/lib/lms-query";
 import { courses as courseImages } from "./courses";
+import { responsiveImage } from "./responsive-images";
 
 const dark = "h-auto rounded-[10px] border border-ink bg-ink p-3 text-sm font-normal leading-[21px] text-primary-foreground hover:bg-ink";
 
@@ -25,7 +26,13 @@ export function CourseCatalogSection({ query, selectedFilter, onReset }: { query
       {visible.map((c) => (
         <Card key={c.number} className="w-full overflow-hidden rounded-2xl border border-border bg-background shadow-none">
           <CardContent className="flex flex-col items-start gap-4 p-[22px]">
-            <img src={c.image} alt={`${c.title} course`} loading="lazy" decoding="async" width={623} height={222} className="aspect-[623/222] w-full rounded-xl object-cover object-center" />
+            <picture className="block w-full">
+              {responsiveImage(c.image) && <>
+                <source type="image/avif" srcSet={responsiveImage(c.image)?.avif} sizes="(min-width: 1440px) 623px, (min-width: 1024px) calc((100vw - 198px) / 2), (min-width: 768px) calc(100vw - 132px), calc(100vw - 92px)" />
+                <source type="image/webp" srcSet={responsiveImage(c.image)?.webp} sizes="(min-width: 1440px) 623px, (min-width: 1024px) calc((100vw - 198px) / 2), (min-width: 768px) calc(100vw - 132px), calc(100vw - 92px)" />
+              </>}
+              <img src={c.image} alt={`${c.title} course`} loading="lazy" decoding="async" width={623} height={222} className="aspect-[623/222] w-full rounded-xl object-cover object-center" />
+            </picture>
             <header className="flex w-full flex-col items-start gap-[15px] rounded-[13px] bg-surface p-[22px]">
               <p className="text-[13px] leading-[19.5px] text-muted-foreground">{c.number}</p>
               <h2 className={`font-semibold text-ink ${c.titleClassName}`}>{c.title}</h2>

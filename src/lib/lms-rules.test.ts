@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { canRegisterDevice, courseSchema, hasActiveAccess, MAX_DEVICES, SLIDE_COUNT, SLIDE_INTERVAL_MS, validateReceipt } from './lms-rules';
+import { canRegisterDevice, courseSchema, hasActiveAccess, MAX_DEVICES, validateReceipt } from './lms-rules';
+import { SLIDE_COUNT, SLIDE_INTERVAL_MS } from './carousel-rules';
 describe('Linear LMS rules', () => {
   it('allows two registered devices but rejects a third', () => {
     expect(MAX_DEVICES).toBe(2); expect(canRegisterDevice(1)).toBe(true); expect(canRegisterDevice(2)).toBe(false);

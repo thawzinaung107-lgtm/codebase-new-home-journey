@@ -1,5 +1,12 @@
 # AI Marketing Academy — focused launch roadmap
 
+## Minimal second-pass performance — 2026-11-18
+- [x] Save clean starting checkpoint `da5dbaf` before edits.
+- [x] Confirm hero image is LCP; inspect actual loaded Zod/schema chunk and critical CSS. Keep blocking CSS, auth and widget behavior unchanged.
+- [x] Add 480/768/1200px AVIF/WebP variants with native picture/srcset/sizes, custom-CMS/original fallback; isolate six-second timing from validation schemas. At 390px/DPR2 image payload drops 458,318 → 109,182 bytes (76.2%).
+- [x] 145 tests PASS / 1 mutating SKIP; automatic build OK; 320/390/620/1280px rendering and navigation pass; stable homepage zero failed requests/errors and autoplay works. Three genuine published mobile Lighthouse baselines recorded; no failed requests. Evidence: `.lovable/second-pass-performance-2026-11-19.md`.
+- [ ] Production after-score, compressed JS savings and under-2.5s LCP await separately authorized live update; development or intercepted-image runs are not production after evidence.
+
 ## Mobile homepage performance — 2026-11-18
 - [x] Diagnose published delivery, throttled mobile loads, font/image chains and touch targets; current browser chunks all HTTP 200, original timeouts not reproduced.
 - [x] Apply same-font first-party Inter, native prioritized hero/lazy catalog images, deferred optional sign-in integration and 44px carousel targets; narrow controls wrap without clipping.

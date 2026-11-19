@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { academyQuery } from "@/lib/lms-query";
-import { SLIDE_INTERVAL_MS } from "@/lib/lms-rules";
+import { SLIDE_INTERVAL_MS } from "@/lib/carousel-rules";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import heroImg from "@/assets/myanmar-hero-desktop.png.asset.json";
 import strategyImg from "@/assets/myanmar-strategy-home-desktop.png.asset.json";
 import creationImg from "@/assets/myanmar-creation-home-desktop.png.asset.json";
 import { scrollToSection } from "./scroll";
+import { responsiveImage } from "./responsive-images";
 
 const slides = [
   { title: "Find your next opportunity", body: "Course news and confirmed offers will appear here.", image: heroImg.url },
@@ -40,6 +41,9 @@ export function DealsAndUpdatesHeroSection() {
   }, [reading, hidden, reduced]);
   const configured = data?.cms.find(s => s.key === `promotion-${active + 1}`);
   const slide = slides[active];
+  const image = configured?.image || slide?.image || heroImg.url;
+  const responsive = responsiveImage(image);
+  const sizes = "(min-width: 1440px) 583px, (min-width: 1024px) calc((100vw - 172px) * 0.46), (min-width: 768px) calc(100vw - 148px), calc(100vw - 108px)";
   return (
     <Card onMouseEnter={() => setReading(true)} onMouseLeave={() => setReading(false)} onFocusCapture={() => setReading(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setReading(false); }} className="w-full overflow-hidden rounded-[20px] border-0 bg-hero text-hero-foreground shadow-none">
       <CardContent className="flex flex-col gap-[17px] px-[30px] pb-[22px] pt-7">
@@ -64,15 +68,21 @@ export function DealsAndUpdatesHeroSection() {
               </Button>
             </div>
           </section>
+          <picture className="block min-w-0 w-full">
+            {responsive && <>
+              <source type="image/avif" srcSet={responsive.avif} sizes={sizes} />
+              <source type="image/webp" srcSet={responsive.webp} sizes={sizes} />
+            </>}
           <img
             alt="People discussing a course opportunity"
-            src={configured?.image || slide?.image || heroImg.url}
+            src={image}
             loading="eager"
             fetchPriority="high"
             width={583}
             height={300}
             className="h-[300px] w-full min-w-0 rounded-xl object-cover object-center"
           />
+          </picture>
         </div>
         <nav aria-label="Deals and updates slides" className="flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1">
           <span className="shrink-0 whitespace-nowrap text-sm leading-[21px] text-hero-muted">0{active + 1} / 03</span>
