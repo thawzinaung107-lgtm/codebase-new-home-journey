@@ -19,9 +19,9 @@ export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(academyQuery),
   head: () => ({
     meta: [
-      { title: "AI Marketing Academy" },
+      { title: "Collin AI Marketing Academy" },
       { name: "description", content: description },
-      { property: "og:title", content: "AI Marketing Academy" },
+      { property: "og:title", content: "Collin AI Marketing Academy" },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -10,7 +10,7 @@ export function NavigationSection() {
     <nav aria-label="Primary navigation" className="flex w-full min-w-0 flex-wrap items-center gap-4">
       <div className="flex flex-1 basis-[350px] items-center text-[19px] font-medium leading-[28.5px] text-ink">
         <img src={logo.url} alt="" aria-hidden="true" width={32} height={32} className="size-8 shrink-0 object-contain" />
-        <span className="ml-2">AI MARKETING ACADEMY</span>
+        <span className="ml-2">COLLIN AI MARKETING ACADEMY</span>
       </div>
       <div className="flex flex-wrap items-center gap-4">
         {items.map(([label, target]) => (
