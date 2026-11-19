@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/academy/SiteFooter";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { NavigationSection } from "@/components/home/NavigationSection";
@@ -62,9 +63,7 @@ function Home() {
         <section aria-label="Learning process steps" className="mb-3 mt-2"><LearningProcessStepsSection /></section>
         <section aria-label="Learning platform features" className="mb-3"><LearningPlatformFeaturesSection /></section>
         <section aria-label="Call to action" className="mb-4"><MarketingJourneyCallToActionSection /></section>
-        <footer id="about" className="text-[13px] leading-[19.5px] text-subtle">
-          AI MARKETING ACADEMY&nbsp;&nbsp;·&nbsp;&nbsp;onlinelearning.ccone.app
-        </footer>
+        <div id="about"><SiteFooter /></div>
       </div>
     </main>
   );

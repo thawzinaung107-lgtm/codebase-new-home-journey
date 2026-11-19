@@ -1,0 +1,7 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { PageShell } from '@/components/academy/PageShell';
+import { pageHead } from '@/lib/metadata';
+import { COMPANY } from '@/lib/company-info';
+export const Route=createFileRoute('/terms')({head:()=>pageHead('Terms of Service','Terms for using AI Marketing Academy online courses.'),component:Terms});
+const items=[['Digital courses','Courses are recorded digital content. Access is granted after payment approval and code redemption, for the access period shown on each course.'],['Account and devices','Each account is for one learner and may be used on up to two registered devices. Sharing accounts or codes is not allowed.'],['Intellectual property','All videos and materials belong to '+COMPANY.name+'. Recording, downloading, copying or redistributing course content is prohibited.'],['Changes','We may update course content and these terms. Material changes will be shown on this page.']];
+function Terms(){return <PageShell><div className="max-w-3xl"><h1 className="text-3xl font-semibold">Terms of Service</h1>{items.map(([h,p],i)=><section key={h} className="mt-8"><h2 className="font-semibold">{i+1}. {h}</h2><p className="mt-2 leading-7 text-muted-foreground">{p}</p></section>)}<p className="mt-10 text-sm text-muted-foreground">Questions: <a className="underline" href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a></p></div></PageShell>;}
